@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="x5-orientation" content="portrait">
+    <title>我的种草</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/favorite.css" />
+</head>
+<body>
+<!--收藏页面-->
+<section id="favorite" v-cloak>
+    <template v-if="infoMessage.goods_data.length===0&&infoMessage.article_data.length===0">
+        <div class="empty">
+            <img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;" />
+            <div class="content">收藏的内容和商品都在这里哦，赶紧去种草吧！</div>
+            <a href="{url:/site/index}" class="gotoFind" v-if="btn_">去种草</a>
+        </div>
+    </template>
+    <div class="favorite_content" v-else>
+        <div class="head">
+            <div class="left flexbox"   @click="changeFavorite(0)">
+                <img :src="state==0?head_state.left_red:head_state.left_black" alt="" :style="head_state.img" />
+                <span :style="state==0?head_state.bg2:head_state.bg1">商品</span>
+            </div>
+            <div class="right flexbox"   @click="changeFavorite(1)">
+                <img :src="state==1?head_state.right_red:head_state.right_black" alt=""  :style="head_state.img" />
+                <span :style="state==1?head_state.bg2:head_state.bg1">专辑</span>
+            </div>
+            <!--判断初始状态结束-->
+        </div>
+        <div class="bg"></div>
+            <template v-if="state==0">
+                <div class="favorite_item favorite_product" :style="changeBgcolor">
+                    <template v-if="infoMessage.goods_data==''">
+                        <div class="emptyFavorite">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;" />
+                            <div class="content">
+                                <span>~</span>
+                                <span>收藏的商品都在这里哦，赶紧去种草吧！</span>
+                                <span>~</span>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div :class="item.cls" v-for="item in new_info_goods">
+                            <div class="left">
+                                <a :href="item.url"><img :src="item.img" alt="" /></a>
+                            </div>
+                            <div class="right">
+                                <div class="top box">
+                                    <a :href="item.url"><div class="name">{{item.name}}</div></a>
+                                    <div class="del" @click="delFavoriteProduct(item)">
+                                        <img src="/views/mobile/skin/default/image/jmj/icon/del_w.png" alt=""  />
+                                    </div>
+                                </div>
+                                <div class="box">
+                                    <a :href="item.url"><div class="price">
+                                        <div class="sellprice">￥ {{item.sell_price}}</div>
+                                        <div class="jpprice">
+                                            日本价：{{item.jp_price}} 円
+                                        </div>
+                                    </div></a>
+                                    <a :href="item.url"><div class="buy">立即购买</div></a>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template v-else>
+                <div class="favorite_item favorite_article" :style="changeBgcolor">
+                    <template v-if="infoMessage.article_data==''">
+                        <div class="emptyFavorite">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/empty_grow.png" alt="" style="width:1.82rem;height:1.65rem;"/>
+                            <div class="content">
+                                <span>~</span>
+                                <span>收藏的内容都在这里哦，赶紧去种草吧！</span>
+                                <span>~</span>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div :class="item.cls" v-for="item in new_article_goods">
+                            <div class="left">
+                                <a :href="item.url"><img :src="item.image" alt="" /></a>
+                            </div>
+                            <div >
+                                <a :href="item.url">
+                                    <div class="name hidewrap">{{item.title}}</div>
+                                    <div class="discribtion">{{item.description}}</div>
+                                </a>
+                            </div>
+                            <div class="del"  @click="delFavoriteArticle(item)">
+                                <img src="/views/mobile/skin/default/image/jmj/icon/del_w.png" alt=""  />
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        <div style="height:1rem;"></div>
+    </div>
+    <footer-nav :state="2" :states="favorite_st"></footer-nav>
+</section>
+<!--<span class="mui-icon-extra mui-icon-extra-top" id="pagetop"></span>-->
+<!--头信息结束-->
+<script src="/views/mobile/javascript/vue.js"></script>
+<script src="/views/mobile/javascript/mui.js"></script>
+<!--//底部导航样式的引入-->
+<script src="/views/mobile/components/footer_nav.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js"></script>
+<script src="/views/mobile/javascript/jiumao/favorite.js"></script>
+</body>
+</html>
+

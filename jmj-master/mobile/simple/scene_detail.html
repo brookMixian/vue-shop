@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="x5-orientation" content="portrait">
+    <title>场景馆title</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/scene/scene.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<div id="scene_detail">
+    <!--头部定位-->
+    <div class="head">
+        <div class="backImg">
+            <img src="/views/mobile/skin/default/image/jmj/product/back.png" alt="" style="width:0.43rem" @click="back"/>
+        </div>
+        <a href="/simple/cart" id="cart" class="locationA">
+            <div class="img">
+                <div class="mark flexbox">{{car_count}}</div>
+                <img src="/views/mobile/skin/default/image/jmj/product/cart.png" alt="" style="width:0.55rem" />
+            </div>
+        </a>
+        <a href="/site/index" class="home locationA"><img src="/views/mobile/skin/default/image/jmj/product/home.png" alt="" style="width:0.55rem" /></a>
+    </div>
+    <div style="height:0.72rem;"></div>
+    <!--场景馆-->
+    <div class="sceneDetail">
+        <!--<img :src="sceneInfo.img" alt=""  style="width:100%"/>-->
+        <img src="/views/mobile/skin/default/image/jmj/img/scene_test.png" style="width:100%" alt="" />
+         <p v-for="item in sceneInfo.goods_list" class="goods" @click="buyGoods(item.id)" :style="item.style"></p>
+        <div class="cho flexbox">
+            <div class="lik like" @click="choLike(1)">
+                <img src="/views/mobile/skin/default/image/jmj/scene/good.png" alt="" />
+                <p>喜欢</p>
+                <p class="num1">{{sceneInfo.good}}</p>
+            </div>
+            <div class="lik unlike" @click="choLike(2)">
+                <img src="/views/mobile/skin/default/image/jmj/scene/bad.png" alt="" />
+                <p>没感觉</p>
+                <p class="num2">{{sceneInfo.bad}}</p>
+            </div>
+        </div>
+    </div>
+    <!--场景馆弹窗-->
+    <section :id="'select_product'+item.id" class="mui-popover mui-popover-action mui-popover-bottom" v-for="item in sceneInfo.goods_list">
+        <div class="header box">
+            <img :src="item.img?item.img:'http://m.jiumaojia.com/pic/thumb/img/upload@_@goods_pic@_@mainPic@_@4901301236210@_@0_https___images-na.ssl-images-amazon.com_images_I_61eh8uI8ekL._SX355_.jpg@_@w@_@500@_@h@_@500'" alt=""  :class="'goodsimg goodsimg'+item.id" />
+            <img src="/views/mobile/skin/default/image/jmj/scene/copy.png" alt="" class="xximg" @click="delModal(item.id)" />
+        </div>
+        <div class="article box">
+            <div class="left hideCamp">{{item.name}}</div>
+            <div class="right"><span>￥</span><span style="font-weight:bold">{{item.sell_price}}</span></div>
+        </div>
+        <div class="num">
+            <div class="numA flexbox">
+                <img src="/views/mobile/skin/default/image/jmj/cart/ruduceable.png" alt="" class="reduce" @click="reduce(item)" />
+                <input type="number" readonly  v-model="item.buyNum"  />
+                <img src="/views/mobile/skin/default/image/jmj/cart/add.png" alt="" class="add" @click="add(item)" />
+            </div>
+        </div>
+        <div class="buyy">
+            <div class="left flexbox" @click="collect(item)">
+                <img :src="item.is_favorite==0?img1:img1_ed" style="width:0.4rem;height:0.4rem;" alt="" />
+                <span :style="item.is_favorite==0?style1:style1_ed">{{item.is_favorite==0?show1:show1ED}}</span>
+            </div>
+            <div class="right" @click="joinCar(item)">加入购物车</div>
+        </div>
+    </section>
+    <!--场景馆下面关联商品-->
+    <section class="relateGoods">
+        <div class="con">
+            <h3 class="box">
+                <p>相关商品 ({{relateGoodsInfo.length}})</p>
+                <div @click="buyAll" >一键购买</div>
+            </h3>
+            <a :href="'/site/products/id/'+item.id" class="goodsItem flexs" v-for="item in relateGoodsInfo">
+                <div class="img">
+                    <img :src="item.img" alt="" :id="'img'+item.id"/>
+                </div>
+                <div class="middle">
+                    <div class="name hideCamp">{{item.name}}</div>
+                    <div class="price box">
+                        <div class="price_l">
+                            <span>￥</span>
+                            <span>{{item.sell_price}}</span>
+                        </div>
+                        <div class="price_r">
+                            <span>日本价：</span>
+                            <span>{{item.jp_price}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart flexbox" @click.prevent="joinCarOne(item)">
+                    <img src="/views/mobile/skin/default/image/jmj/active_valentines/cart.png" alt="">
+                </div>
+            </a>
+        </div>
+    </section>
+    <!--更多场景-->
+    <section class="relateScene">
+        <h4>更多场景</h4>
+        <div class="wrapper">
+            <div class="mark">
+                <a v-for="item in sceneInfo.list" :href="'/simple/scene_detail/id/'+item.id">
+                    <img :src="item.cover" alt="" style="width:3.2rem;height:1.78rem;" />
+                </a>
+            </div>
+        </div>
+    </section>
+    <div style="height:0.72rem;"></div>
+</div>
+<script src="/views/mobile/javascript/vue.js"></script>
+<script src="/views/mobile/javascript/mui.js"></script>
+<script src="/views/mobile/components/loadding.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js"></script>
+<script type="text/javascript">
+    var eid="{echo:IReq::get('id')}";
+     var vm=new Vue({
+         el:"#scene_detail",
+         data:{
+             //是否种草
+             img1_ed:"/views/mobile/skin/default/image/jmj/home_redesign/collection2_ed.png",
+             img1:"/views/mobile/skin/default/image/jmj/home_redesign/collection2.png",
+             show1ED:"已种草",
+             show1:"种草",
+             style1:"color:#484848",
+             style1_ed:"color:#ff5959",
+             car_count:0,
+             sceneInfo:[],
+             relateGoodsInfo:[],
+             allBuy:"",
+             ajaxButton:true
+         },
+         mounted:function(){
+            var self=this;
+             car_shop_num(self);
+             getRelateInfo(self);
+             getSceneInfo(self)
+         },
+         methods:{
+             back:function(){
+                 window.history.back();
+             },
+//             场景点赞
+             choLike:function(op){
+                 var self=this;
+                 mui.ajax({
+                     data:{
+                         scene_id:self.sceneInfo.id,
+                         opt:op
+                     },
+                     url:"/apic/scene_praise",
+                     dataType:'json',//服务器返回json格式数据
+                     type:'get',//HTTP请求类型
+                     timeout:10000,//超时时间设置为10秒；
+                     success:function(data){
+                         if(data.code!=0){
+                             alert(data.msg);
+                             return;
+                         }
+                         if(op===1) self.sceneInfo.good++;
+                         if(op===2) self.sceneInfo.bad++;
+                     }
+                 })
+             },
+//             单件商品添加购物车
+             joinCarOne:function(item){
+                 if(this.ajaxButton){
+                     this.ajaxButton=false;
+                 }else{
+                     return;
+                 }
+                 var self=this;
+                 var data=item.id+":1:goods";
+                 mui.ajax({
+                     data:{
+                         goods:data
+                     },
+                     url:"/apic/cart_join",
+                     dataType:'json',//服务器返回json格式数据
+                     type:'get',//HTTP请求类型
+                     timeout:10000,//超时时间设置为10秒；
+                     success:function(data){
+                         self.ajaxButton=true;
+                         console.log(data);
+                         if(data.code!=0){
+                             alert(data.msg);
+                             return false;
+                         }
+                         flyCart(item.id);
+                         self.car_count++;
+                     }
+                 })
+             },
+             buyAll:function(){
+                 var self=this;
+                 if(self.ajaxButton){
+                     self.ajaxButton=false;
+                 }else{
+                     return;
+                 }
+                 mui.ajax({
+                     data:{
+                         goods:self.allBuy
+                     },
+                     url:"/apic/cart_join",
+                     dataType:'json',//服务器返回json格式数据
+                     type:'get',//HTTP请求类型
+                     timeout:10000,//超时时间设置为10秒；
+                     success:function(data){
+                         self.ajaxButton=true;
+                         console.log(data);
+                         if(data.code!=0){
+                             alert(data.msg);
+                             return false;
+                         }
+                         self.relateGoodsInfo.map(function(item){
+                             flyCart(item.id);
+                             self.car_count++;
+                         })
+                     }
+                 })
+             },
+             reduce:function(obj){
+                  if(obj.buyNum<=1){
+                      obj.buyNum=1
+                  }else{
+                      obj.buyNum--
+                  }
+             },
+             add:function(obj){
+                 var storeNum=parseInt(obj.store_nums);
+                 if(obj.buyNum>=storeNum){
+                     obj.buyNum=storeNum
+                 }else{
+                     obj.buyNum++
+                 }
+             },
+             buyGoods:function(id){
+                 mui("#select_product"+id).popover('show');
+            },
+             delModal:function(id){
+                 mui("#select_product"+id).popover('hide');
+             },
+             joinCar:function(obj){
+                 var self=this;
+                 var data=obj.id+":"+obj.buyNum+":goods";
+                 mui.ajax({
+                     data:{
+                         goods:data
+                     },
+                     url:"/apic/cart_join",
+                     dataType:'json',//服务器返回json格式数据
+                     type:'get',//HTTP请求类型
+                     timeout:10000,//超时时间设置为10秒；
+                     success:function(data){
+                         self.ajaxButton=true;
+                         console.log(data);
+                         if(data.code!=0){
+                             alert(data.msg);
+                             return false;
+                         }
+                         flyCartScene(obj)
+                         self.car_count+=obj.buyNum;
+                     }
+                 })
+             },
+             collect:function(item){
+                 mui.ajax('/simple/favorite_add/_paramKey_/_paramVal_',{
+                     data:{
+                         goods_id:item.id,
+                         random:Math.random()
+                     },
+                     dataType:'json',//服务器返回json格式数据
+                     type:'get',//HTTP请求类型
+                     timeout:10000,//超时时间设置为10秒；
+                     success:function(data){
+                         console.log(data);
+                         if(data.message==""){
+                             item.is_favorite=0;
+                         }else{
+                             item.is_favorite=1;
+                         }
+                         console.log(obj);
+                     }
+                 });
+             }
+         }
+     })
+     //获取购物车数量
+     function car_shop_num(self){
+         $.ajax({
+             url:"/apic/cart_count",
+             dataType:'json',//服务器返回json格式数据
+             type:'get',//HTTP请求类型
+             timeout:10000,//超时时间设置为10秒；
+             success:function(data){
+//				console.log(data);
+                 self.car_count = data.data.car_count
+             }
+         })
+     }
+     //临时获取需要的数据
+     function getRelateInfo(self){
+         mui.ajax({
+             data:{
+                 aid:3
+             },
+             url:"/apic/activity_goods_list",
+             dataType:'json',//服务器返回json格式数据
+             type:'get',//HTTP请求类型
+             timeout:10000,//超时时间设置为10秒；
+             success:function(data){
+                 self.relateGoodsInfo=data.data;
+                 self.relateGoodsInfo.map(function(item){
+                     self.allBuy+=item.id+":1:goods,"
+                 })
+             }
+         })
+     }
+     function getSceneInfo(self){
+         mui.ajax({
+             data:{
+                 scene_id :eid
+             },
+             url:"/apic/scene_detail",
+             dataType:'json',//服务器返回json格式数据
+             type:'get',//HTTP请求类型
+             timeout:10000,//超时时间设置为10秒；
+             success:function(data){
+                 document.title=data.data.title;
+                 data.data.goods_list.map(function(item){
+                     item.x1=item.coord_x.split(",")[0]/100;
+                     item.x2=item.coord_x.split(",")[1]/100;
+                     item.y1=item.coord_y/100-0.16;
+                     item.y2=item.coord_y/100+0.16;
+                     item.style="position:absolute;top:"+item.coord_y/100+"rem;left:"+item.x1+"rem;width:"+(item.x2-item.x1)+"rem;height:0.32rem";  item.buyNum=1;
+                 })
+                self.sceneInfo=data.data;
+                 console.log(self.sceneInfo);
+             }
+         })
+     }
+     //    实现商品飞入购物车函数
+     function flyCart(id){
+         var cartPosition,top,pro,cloneDiv,scrollTop,divWidth;
+//        定义购物车的位置
+         cartPosition=$("#cart").offset();
+         scrollTop=$(window).scrollTop();
+//        定义商品图片的位置
+         pro=$("#img"+id).offset();
+         top=pro.top+cartPosition.top-scrollTop*2;
+         divWidth=$("#img"+id).width()/2;
+         console.log(divWidth)
+         //克隆div实现动画
+         cloneDiv=$("#img"+id).clone();
+         console.log($("#img"+id).width());
+         $("#img"+id).parent().append(cloneDiv);
+         cloneDiv.addClass("rotate").css({'left':divWidth/2,'z-index':100}).animate({
+             left: cartPosition.left-$("#cart").width(),
+             top:-top+$("#cart").height(),
+             width:10,
+             height:10,
+         },"slow",function(){
+             cloneDiv.remove();
+         });
+     }
+     //    实现商品飞入购物车函数
+     function flyCartScene(obj){
+         var cartPosition,top,pro,cloneDiv,scrollTop;
+//        定义购物车的位置
+         cartPosition=$("#cart").offset();
+         scrollTop=$(window).scrollTop();
+//        定义商品图片的位置
+         pro=$(".goodsimg"+obj.id).offset();
+         top=pro.top+cartPosition.top-scrollTop*2;
+         console.log(top);
+         //克隆div实现动画
+         cloneDiv=$(".goodsimg"+obj.id).clone();
+         $(".goodsimg"+obj.id).parent().append(cloneDiv);
+         cloneDiv.addClass("rotate").css({position:'absolute',top:'-1.2rem',left:0,'z-index':100}).animate({
+             left: cartPosition.left,
+             top:-top-10,
+             width:10,
+             height:10,
+         },"slow",function(){
+             cloneDiv.remove();
+             mui("#select_product"+obj.id).popover('hide');
+         });
+     }
+</script>
+</body>
+</html>
+

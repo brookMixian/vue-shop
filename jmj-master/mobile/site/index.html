@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="x5-orientation" content="portrait">
+		<title>
+			<?php echo !empty(ISession::get('shop_name')) ? ISession::get('shop_name') : '九猫大百货'?>
+		</title>
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/icons-extra.css?v=<?php echo time(); ?>" />
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/app/jiumao.css?v=<?php echo time(); ?>" />
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/app/siteIndex.css?v=<?php echo time(); ?>" />
+		<link rel="stylesheet" href="/views/mobile/skin/default/css/app/mao.css" />
+	</head>
+
+	<body>
+		<section id="indexInfo" v-cloak>
+			<!--		搜索样式展开 			-->
+			<search-nav :search="search" :val="null" v-if="search_top"></search-nav>
+			<!--		搜索样式			-->
+			<div id="search_" @click="search_tops" v-if="search_top_small">
+				<img src="/views/mobile/skin/default/image/jmj/home_redesign/search.png" style="width: 0.8rem;" />
+			</div>
+
+			<!--		底部导航					-->
+			<head-nav :state="0"></head-nav>
+			<!--		轮播图				-->
+			<div id="slider1" class="mui-slider" style="height: 3.4rem;">
+				<div class="mui-slider-group mui-slider-loop">
+					<div class="mui-slider-item mui-slider-item-duplicate">
+						<a :href="indexInfo.banner[indexInfo.banner.length-1].url" class="locationA">
+							<img :src="indexInfo.banner[indexInfo.banner.length-1].img" style="height: 3.4rem;">
+						</a>
+					</div>
+					<div class="mui-slider-item" v-for="item in indexInfo.banner">
+						<a :href="item.url" class="locationA">
+							<img :src="item.img" class="samLazyImg" style="height: 3.4rem;">
+						</a>
+					</div>
+					<div class="mui-slider-item mui-slider-item-duplicate">
+						<a :href="indexInfo.banner[0].url" class="locationA">
+							<img :src="indexInfo.banner[0].img" style="height: 3.4rem;">
+						</a>
+					</div>
+				</div>
+				<div class="mui-slider-indicator" style="bottom:0.16rem;">
+					<div class="mui-indicator mui-active" style="margin-right:-3px"></div>
+					<div class="mui-indicator" v-for="key in indexInfo.banner.length-1"></div>
+				</div>
+			</div>
+			<!--		限时抢				-->
+			<!--<div id="Timed_to_rob" v-if="shop_time" v-cloak>-->
+			<div id="Timed_to_rob" v-if="shop_time" v-cloak>
+				<div class="albumn_index" style="height: auto;">
+					<h1>
+		   				<img src="/views/mobile/skin/default/image/jmj/home_redesign/time.png" style="width: 0.34rem;"/>
+		   				<p class="p1">限时抢</p>
+		   				<span class="span1" style="margin-top: 0.1rem;">离结束还剩</span>
+		   				<p class="p2"><span id="timer_hhh">{{hours}}</span> : <span id="timer_mmm">{{minutes}}</span> : <span id="timer_sss">{{seconds}}</span></p>
+		   				<p class="p3" @click="Timed_to_">更多 <span><img src="/views/mobile/skin/default/image/jmj/home_redesign/more.png" style="width: 0.14rem;"/></span></p>
+		   			</h1>
+					<div class="line_time"></div>
+					<div class="mark" style="background: #fff;">
+						<div class="product">
+							<div class="slider">
+								<div class="item" v-for="item in shop_info_time">
+									<a href="#" @click="time_shop(item.id)">
+										<div class="img"><img :dataimg="item.img" alt="" src="/views/mobile/skin/default/image/jmj/product/ware_lazy.png" class="samLazyImg" style="width: 1.56rem; height: 1.56rem;"></div>
+										<div class="name hidewrap">{{item.name}}</div>
+										<div id="xian" class="sellprice" style="font-size: 0.3rem;"><span style="font-size: 0.2rem; color: #ff2f5c; margin-right: -0.08rem;">￥</span> {{item.sell_price}} </div>
+										<div class="yuanjia">原价：<s style="font-size: 0.26rem;font-family: helvetica;">{{item.old_price}}</s></div>
+									</a>
+									<div class="singleline"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--						4个正品										-->
+			<div id="z_special" style="margin-top: 0.2rem;">
+				<ul>
+					<li @click="Brand_pavilion">
+						<img src="/views/mobile/skin/default/image/jmj/home_redesign/Brand_pavilion.png" style="width: 1.2rem;" />
+						<p>品牌馆</p>
+					</li>
+					<li @click="scene_pavilion">
+						<img src="/views/mobile/skin/default/image/jmj/home_redesign/scene_pavilion.png" style="width: 1.2rem;" />
+						<p>场景馆</p>
+					</li>
+					<li @click="newproduct">
+						<img src="/views/mobile/skin/default/image/jmj/home_redesign/newproduct.png" style="width: 1.2rem;" />
+						<p>本周新品</p>
+					</li>
+	
+					<li @click="zheng">
+						<img src="/views/mobile/skin/default/image/jmj/home_redesign/Authentic.png" style="width: 1.2rem;" />
+						<p>正品保证</p>
+					</li>
+				</ul>
+			</div>
+			<!--						视频特辑								-->
+			<div id="Video_special" style="padding-top:0.2rem ;">
+				<div class="img_play">
+					<img @click="Video_pro" class="img_video" src="/views/mobile/skin/default/image/jmj/home_redesign/video.png" style="width: 7rem;display: block;margin: auto;" />
+					<!--<img src="/views/mobile/skin/default/image/jmj/home_redesign/play_index.png" class="index_play"/>-->
+				</div>
+			</div>
+			
+			<!--<div id="aaaa" style="width: 100%;background: #fff;padding:0.2rem 0;margin-top: 0.2rem;">
+				<img src="/views/mobile/skin/default/image/jmj/home_redesign/chunjie.png" style="width: 7.24rem;display: block;margin: 0 auto;"/>
+			</div>-->
+			
+			<!--							元旦							-->
+			<!--<div class="tips" style="margin-top:0.2rem;background:#fff ;padding:0 0.1rem;">
+        <img src="/views/mobile/skin/default/image/jmj/new_active/index/tip.png" alt=""  style="width:100%" />
+    </div>-->
+			<!--								活动								-->
+			<!--<div class="activity">
+        <div class="bg">
+            <img src="/views/mobile/skin/default/image/jmj/new_active/index/bottomleft.png" alt=""  style="width:0.74rem" class="bottomleft" />
+            <img src="/views/mobile/skin/default/image/jmj/new_active/index/bottomright.png" alt=""  style="width:0.74rem" class="bottomright" />
+        </div>
+        <div class="top">
+            <img src="/views/mobile/skin/default/image/jmj/new_active/index/middle.png" alt=""  style="width:2.98rem;height:0.64rem"  />
+        </div>
+        <div class="img flexbox">
+            <a class="img1 locationA" href="/activity/christmas_ticket">
+                <img src="/views/mobile/skin/default/image/jmj/new_active/index/pic1.png" alt="" />
+            </a>
+            <span class="img1 "  @click="toActive()">
+                <img src="/views/mobile/skin/default/image/jmj/new_active/index/pic2.png" alt="" />
+            </span>
+        </div>
+    </div>-->
+			<!--							限时购											-->
+			<!--<div id="" style="overflow: hidden;margin: 0.6rem 0;height: 1.4rem;">
+    	<div class="clock" >
+			<img src="/views/mobile/skin/default/image/jmj/article/time.png" style=" width:100%"/>
+		</div>
+    </div>-->
+
+			<!--							分类												-->
+			<div id="article_list">
+				<div class="hot_category">
+					<div class="head flexbox">
+						<div style="height: 0.4rem;width: 100%;position: relative;">
+							<span class="darkline"></span>
+							<p class="zhuan">热门榜单</p>
+							<span class="darkline2"></span>
+						</div>
+						<p class="line_f" style="font-size: 0.22rem;color: #b8b8b8;">ホットアイテム</p>
+					</div>
+					<ul>
+						<li><img @click="list_index(1)" src="/views/mobile/skin/default/image/jmj/home_redesign/1.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(2)" src="/views/mobile/skin/default/image/jmj/home_redesign/2.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(3)" src="/views/mobile/skin/default/image/jmj/home_redesign/3.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(4)" src="/views/mobile/skin/default/image/jmj/home_redesign/4.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(5)" src="/views/mobile/skin/default/image/jmj/home_redesign/5.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(6)" src="/views/mobile/skin/default/image/jmj/home_redesign/6.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(7)" src="/views/mobile/skin/default/image/jmj/home_redesign/7.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(8)" src="/views/mobile/skin/default/image/jmj/home_redesign/8.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(9)" src="/views/mobile/skin/default/image/jmj/home_redesign/9.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(10)" src="/views/mobile/skin/default/image/jmj/home_redesign/10.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(11)" src="/views/mobile/skin/default/image/jmj/home_redesign/11.png" style="width: 3.5rem;" /></li>
+						<li><img @click="list_index(12)" src="/views/mobile/skin/default/image/jmj/home_redesign/12.png" style="width: 3.5rem;" /></li>
+					</ul>
+					<!--<div>
+						<div class="item_img">
+							<a href="#" @click="toArticle_list(item)" class="img" v-for="item in indexInfo.article_category_list.ac">
+								<img alt="" :src="item.image" class="samLazyImg" />
+							</a>
+						</div>
+					</div>-->
+				</div>
+			</div>
+			<!--							图文专辑											-->
+			<section class="recommended line albumn_index" v-for="item in article_list">
+				<div>
+					<div class="title" >
+						<span class="logo">
+							<img :src="item.icon" alt="" class="img-hot">
+						</span>
+						<span class="name">{{item.category_name}}</span>
+						<img class="images" src="/views/mobile/skin/default/image/jmj/home_redesign/tuwen.png" style="width: 2rem;" />
+						<span class="like mui-pull-right" v-if="">
+							<img @click="collect(item.id,item)" :src="item.is_favorite ==0 ? img1:img2" style="width: 0.34rem;" alt="" class="img-like">
+						</span>
+						<span class="num mui-pull-right favorite" :style="item.num_color?color2:color1">{{item.favorite_num}}</span>
+					</div>
+					<a href="#" id="product_item286">
+						<div class="content">
+							<div class="img flexbox" style="background: #fff;"><img @click="wenzhang_pro(item.id)" :src="item.image" style="width: 7.1rem; border-radius: 0.1rem;"></div>
+						</div>
+					</a>
+					<div class="single"></div>
+					<div class="mark">
+						<div class="product">
+							<div class="slider">
+								<div class="item" v-for="items in item.list">
+									<a href="#" @click="tuwen(items.id)">
+										<div class="img"><img :dataimg="items.img" src="/views/mobile/skin/default/image/jmj/product/ware_lazy.png" alt="" class="samLazyImg" style="width: 1.56rem; height: 1.56rem;"/></div>
+										<div class="name hidewrap">{{items.name}}</div>
+										<div class="sellprice" style="font-size: 0.28rem;"><span style="font-size: 0.2rem; color: #ff2f5c; margin-right: -0.08rem;">￥ </span> {{items.sell_price}} </div>
+									</a>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div id="the_zone" class="mark">
+				<div class="hot_category product">
+					<div class="head flexbox">
+						<div style="height: 0.7rem;width: 100%;position: relative;">
+							<span class="darkline" style="top: 0.28rem;"></span> 
+							<p class="zhuan" style="margin-top: 0.1rem;">专区推荐</p> 
+							<span class="darkline2" style="top: 0.28rem;"></span>
+						</div>
+						<p class="line_f" style="font-size: 0.22rem;color: #b8b8b8;">カテゴリのおすすめ</p>
+					</div>
+					<div class="post_shop" v-for="item in zhuan_index">
+						<div class="banner" @click="zhuan_pro(item)"><img :src="item.banner" style="width: 7.1rem;"/></div>
+						<div class="scrll">
+							<ul class="slider">
+								<li class="item" @click="zhuan_shop(item2.id)" v-for="item2 in item.goods_list">
+									<img :dataimg="item2.img" src="/views/mobile/skin/default/image/jmj/product/ware_lazy.png" alt="" class="samLazyImg" style="width: 1.56rem;"/>
+									<p>{{item2.name}}</p>
+								</li>
+							</ul>
+						</div>
+						<div class="xian_list" style="background:#f5f5f5 ;width:100%;height:0.2rem;"></div>
+					</div>
+					<!--<div class="link_zhuan">
+						<div class="left_link">
+							<img src="/views/mobile/skin/default/image/jmj/home_redesign/see.png" style="width: 0.42rem;"/>
+							<span>344</span>
+						</div>
+						<div class="center_link">
+							<img src="/views/mobile/skin/default/image/jmj/home_redesign/Thumb.png" style="width: 0.42rem;"/>
+							<span>20</span>
+						</div>
+						<div class="right_link">
+							<img src="/views/mobile/skin/default/image/jmj/home_redesign/share.png" style="width: 0.42rem;"/>
+						</div>
+					</div>-->
+				</div>
+				
+			</div>
+			<div id="footer_index">
+				<div class="index_top" @click="guan()">
+					<span></span>
+					<p><img src="/views/mobile/skin/default/image/jmj/home_redesign/index_bottom.png" style="width: 1.81rem;"/></p>
+					<span></span>
+				</div>
+				<p class="index_kan" style="width:100%;text-align: center;">点击 , &nbsp; &nbsp;去 逛 逛 吧 </p>
+			</div>
+			<!--<section class="recommended line albumn_index" v-for="(item,key) in new_data" v-if="item.goods_num>2">
+				<article-list :item="item" :img1="img1" :img2="img2" @col="collect" :state="0"></article-list>
+			</section>-->
+			<!--<cat-refresh v-show="showCat"></cat-refresh>-->
+			<!--<div class="fix-toTop hide" @click="fixToTop">
+				<img src="/views/mobile/skin/default/image/jmj/icon/top-icon.png" alt="" />
+			</div>-->
+			<footer-nav :state="0" :states="index_st"></footer-nav>
+		</section>
+		<!--<div style="padding-bottom:2.42rem;background:#f8f8f8 ;z-index: 10;"></div>-->
+		<!--<div class="fix-nav">
+			<div class="img"><img src="/views/mobile/skin/default/image/jmj/icon/rmb.png" alt="" class="img-rmb" />
+				<div class="content">
+					<span>{echo:(new Config('site_config'))->exchange_rate_jp}</span>
+				</div>
+			</div>
+		</div>-->
+
+		<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+		<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+		<!--加载顶部导航-->
+		<script src="/views/mobile/components/head_nav.js?v=<?php echo time(); ?>"></script>
+		<!--article-list组件引入-->
+		<script src="/views/mobile/components/article_list.js?v=<?php echo time(); ?>"></script>
+		<!--搜索组件引入-->
+		<script src="/views/mobile/components/search_nav.js?v=<?php echo time(); ?>"></script>
+		<!--底部导航样式的引入-->
+		<script src="/views/mobile/components/footer_nav.js?v=<?php echo time(); ?>"></script>
+		<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+		<script src="/views/mobile/javascript/lazyload.js?v=<?php echo time(); ?>"></script>
+		<!--<script src="/views/mobile/javascript/time.js"></script>-->
+		<script src="/views/mobile/javascript/jiumao/common.js?v=<?php echo time(); ?>"></script>
+		<script src="/views/mobile/javascript/jiumao/wechat.js?v=<?php echo time(); ?>"></script>
+
+		<!-- 微信分享 -->
+		{if:IClient::isWechat() == true}
+		<?php 
+    require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+    $this->wechat = new wechat();
+    $this->wechat->setConfig();
+    $this->wechat->config['wechat_jsApiSDK']=1;
+    $this->wechat->jsApiSDK();
+?>
+		<script>
+			//微信分享
+			var wechat_share = {
+				title: '九猫大百货-日本同价-东京直邮', //标题
+				desc: '欢迎来到九猫家', //描述
+				link: "{echo:IWeb::$app->config['image_host1']}/site/ticket_gain?pid={$this->user['user_id']}&aid={echo:(new Config('jmj_config'))->activity_id}&iid={echo:ISession::get('shop_identify_id')}",
+				imgUrl: "{echo:IWeb::$app->config['image_host'] . '/views/mobile/skin/default/image/jmj/img/cat-logo-small.png'}", //图片
+			}
+			wechat.share();
+		</script>
+		{/if}
+		<script type="text/javascript" src="/views/mobile/javascript/jiumao/siteIndex.js?v=<?php echo time(); ?>"></script>
+		<script type="text/javascript">
+			//
+			//window.onload=function(){
+			//	var clock=document.getElementsByClassName("clock")[0];
+			//	var time=new Date();
+			//	var h=drawpointer(0.04,0.22,"#000",time.getHours()*30+time.getMinutes()*6/12);
+			//	var m=drawpointer(0.03,0.3,"#000",time.getMinutes()*6);
+			//	var s=drawpointer(0.02,0.38,"red",time.getSeconds()*6);
+			//	setInterval(function(){
+			//		var time=new Date();
+			//		h.style.WebkitTransform="rotate("+(time.getHours()*30+time.getMinutes()*6/12)+"deg)";
+			//		m.style.WebkitTransform="rotate("+time.getMinutes()*6+"deg)";
+			//		s.style.WebkitTransform="rotate("+time.getSeconds()*6+"deg)"
+			//	},1000);
+			//	
+			//	
+			//	function drawpointer(w,h,b,d){
+			//		var newdiv=document.createElement("div");
+			//	//                中间的圆
+			//		var newd=document.createElement("div");
+			////		newd.style.cssText="width:10px;height:10px;border-radius:50%;background:;position:absolute;left:0px;top:0px;"
+			//		newdiv.style.cssText="width:"+w+"rem;height:"+h+"rem;position:absolute;left:"+((7.48-w/100)/2)+"rem;top:"+(0.7-h)+"rem;background:"+b+";-webkit-transform:rotate("+d+"deg);-webkit-transform-origin:center bottom;";
+			//			clock.appendChild(newdiv);
+			//			clock.appendChild(newd);
+			//			return newdiv;
+			//		}
+			//	}
+		</script>
+	</body>
+
+</html>

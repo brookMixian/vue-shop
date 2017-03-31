@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>评论</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/app/comment/comment1.css?v=<?php echo time(); ?>"/>
+</head>
+<body>
+<div id="commentInfo" v-cloak>
+    <!--加载动画-->
+    <div v-if="showLoad" id="loading">
+        <div class="spinner">
+            <div class="spinner-container container1">
+                <div class="circle1"></div>
+                <div class="circle2"></div>
+                <div class="circle3"></div>
+                <div class="circle4"></div>
+            </div>
+            <div class="spinner-container container2">
+                <div class="circle1"></div>
+                <div class="circle2"></div>
+                <div class="circle3"></div>
+                <div class="circle4"></div>
+            </div>
+            <div class="spinner-container container3">
+                <div class="circle1"></div>
+                <div class="circle2"></div>
+                <div class="circle3"></div>
+                <div class="circle4"></div>
+            </div>
+        </div>
+    </div>
+      <div class="loadImg">
+          <div class="top">选择图片</div>
+          <div class="imgArea">
+              <div class="img" v-for="(item,key) in img">
+                  <img :src="item" alt="" @click="perview(item)"/>
+                  <img src="/views/mobile/skin/default/image/jmj/comment/del.png" alt="" class="del" @click="delImg(key)"/>
+              </div>
+              <div class="addimg" v-if="imgLength<maxLength" @click="choImgFun">
+                  <img src="/views/mobile/skin/default/image/jmj/comment/car.png" alt="" />
+              </div>
+          </div>
+      </div>
+    <div class="voiceInfo" v-if="hideVoice">
+        <h3 class="top">说点什么吧</h3>
+        <div class="content content1 flexbox" v-if="voiceState==1">
+            <img src="/views/mobile/skin/default/image/jmj/comment/voice1.png" alt="" style="width:1.2rem;margin-top:0.3rem" @click="startV"/>
+            <div class="con con1">点击录制</div>
+        </div>
+        <div class="content content1 flexbox" v-if="voiceState==2">
+            <img :src="startSrc" alt="" style="height:0.7rem;margin-top:0.3rem" @click="endV"/>
+            <div class="con con1" style="margin-top:0.5rem;">正在录音,点击停止</div>
+        </div>
+        <div class="content content2 flexbox" v-if="voiceState==3">
+            <div>
+                <img :src="startSrc1" alt="" style="height:0.7rem;margin-top:0.18rem;"  @click="voicePlay"/>
+            </div>
+            <div class="con con1" style="margin-top:0.2rem">
+                 <span class="beginStart" @click="beginStart">重录</span>
+                <span class="del" @click="delVoice">删除</span>
+            </div>
+        </div>
+    </div>
+    <div class="texteare">
+    	<h1>说点什么吧</h1>
+        <textarea maxlength="100" name="" id="textear"  rows="5" v-model="textarea"
+                  placeholder="写下购买体会和使用感受来帮助其他小伙伴 ^_^" @keyup="changeNum"></textarea>
+        <p >{{inputLength}}/100</p>
+    </div>
+    <div class="markInfo">
+        <div class="top">
+            选择标签
+        </div>
+        <div class="info flexstart">
+            <div :class="item.cho?class2:class1" v-for="item in mark" @click="changeState(item)">
+                    {{item.name}}
+            </div>
+        </div>
+    </div>
+    <div class="bottom flexbox">
+        <span class="bg"></span>
+        <span style="font-size:0.2rem;color:#b8b8b8;display:inline-block;margin:0 0.24rem">喵，您的评价帮助我们做得更好</span>
+        <span class="bg"></span>
+    </div>
+    <div class="fixedBot flexbox">
+        <div class="submit" :style="checkSubmit?style2:style1" @click="submit">提交评价</div>
+    </div>
+</div>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<script>
+    var getId="{echo:IReq::get('id')}";
+    var vm=new Vue({
+        el:"#commentInfo",
+        data:{
+            id:getId,//获取页面传过来的id
+            showLoad:false,//是否显示加载页
+            maxLength:5,//最大可以上传图片的数量
+            imgLength:0,//当前已上传图片数量
+            maxMark:3,//最大可以选择标签数
+            voiceState:1, //录制状态 1代表没有录制  2代表录正在录制  3 代表录制完成
+            markLen:0, //当前所选标签的长度,
+            hideVoice:false,//开发中隐藏评论
+            checkSub:false,
+            textarea:"",
+            style1:"opacity:0.5",
+            style2:"opacity:1",
+            //播放语音的动画
+            img_arr:[
+                   "/views/mobile/skin/default/image/jmj/comment/003.png" ,
+                    "/views/mobile/skin/default/image/jmj/comment/002.png",
+                    "/views/mobile/skin/default/image/jmj/comment/001.png",
+                    "/views/mobile/skin/default/image/jmj/comment/002.png"
+            ],
+            startNum:1,//开始播放语音的num
+            startSrc:"/views/mobile/skin/default/image/jmj/comment/003.png",
+            startSrc1:"/views/mobile/skin/default/image/jmj/comment/003.png",
+            pause:false, //播放开始与暂停
+            //我们的文件
+            choImg:[],
+            img:[], //本地图片
+            voice:"",
+            localVoice:"",//本地语音 用于播放
+//            用户选择标签选项
+            class1:"item",
+            class2:"item active",
+            mark:[],
+            inputLength:100
+        },
+        computed:{
+            checkSubmit:function(){
+                //判断用户选择内容是否可以提交
+                if(this.markLen||this.choImg.length||this.voice!=""||this.textarea!="")
+                {
+                    this.checkSub=true;
+                }
+                else{
+                    this.checkSub=false;
+                }
+                return this.checkSub;
+            },
+            tag_id:function(){
+                var tag_id=[];
+                this.mark.map(function(item){
+                    if(item.cho){
+                        tag_id.push(item.id)
+                    }
+                })
+                return tag_id.join(",");
+            }
+        },
+        mounted:function(){
+           getTagList(this);
+        },
+        methods:{
+//            从本地选择图片或者拍照
+            choImgFun:function(){
+                chooseImage(this);
+            },
+            //删除最后一张已选择的图片
+            delImg:function(key){
+                this.img.splice(key,1);
+                this.choImg.splice(key,1);
+                this.imgLength--;
+            },
+            //图片预览功能
+            perview:function(item){
+                perviewImg(item,this);
+            },
+            //开始录音
+            startV:function(e){
+                console.log(e)
+                var self=this;
+                startRecord(self);
+                //开始录音得清除播放的动画
+                clearInterval(self.v);
+                this.voiceState=2;
+            },
+            voicePlay:function(){
+                //开始录音得清除录音的动画
+                clearInterval(self.f);
+                playVoice(this);
+            },
+            //停止录音
+            endV:function(e){
+                stopRecord(this);
+            },
+            beginStart:function(){
+                this.voice="";
+                this.localVoice="";
+                this.voiceState=2;
+                startRecord(this);
+                //开始录音得清除播放的动画
+                clearInterval(self.v);
+                this.pause=false;
+            },
+            //删除录音功能
+            delVoice:function(){
+                var self=this;
+                this.voice="";
+                clearInterval(self.f);
+                clearInterval(self.v);
+                self.voiceState=1;
+                self.pause=false;
+            },
+            changeNum: function(){
+                var length=parseInt(document.getElementById("textear").value.length);
+                this.inputLength= 100-length;
+            },
+//            选择标签,最多只能选择三个标签
+            changeState:function(item){
+                if(this.maxMark>this.markLen){
+                    if(!item.cho){
+                        item.cho=true;
+                        this.markLen++
+                    }else{
+                        item.cho=false;
+                        this.markLen--
+                    }
+                }else{
+                   if(item.cho){
+                       item.cho=false;
+                       this.markLen--
+                   }
+                }
+            },
+            //提交并上传文件到微信服务器
+            submit:function(){
+                if(!this.checkSub){
+                    return false;
+                }
+                this.showLoad=true;
+                upload(this);
+            }
+        }
+    })
+    function getTagList(self){
+        mui.ajax('/apic/comment_tag_list',{
+            dataType:'json',//服务器返回json格式数据
+            type:'get',//HTTP请求类型
+            timeout:10000,//超时时间设置为10秒
+            success:function(data){
+                data.data.map(function(item){
+                    item.cho=false;
+                })
+                self.mark=data.data;
+            }
+        });
+    }
+    //提交图片 语音
+    function upload(self){
+//        处理获得的数据
+        var sub_data={
+            id:self.id,
+            content:self.textarea,
+            tag_id:self.tag_id,
+            image_media_id:self.choImg.join(","),
+            voice_media_id:self.voice
+        };
+        console.log("图片"+sub_data.image_media_id);
+        console.log("语音"+sub_data.voice_media_id)
+        //发送ajax提交后台
+        mui.ajax('/apic/comment_add',{
+            data:sub_data,
+            dataType:'json',//服务器返回json格式数据
+            type:'get',//HTTP请求类型
+            timeout:10000,//超时时间设置为10秒
+            success:function(data){
+                console.log(sub_data)
+                console.log(data);
+                self.showLoad=false; //停止加载
+                window.location.href="/ucenter/order"
+            }
+        });
+    }
+</script>
+
+<!-- 微信分享 -->
+{if:IClient::isWechat() == true}
+<?php
+    require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+    $this->wechat = new wechat();
+$this->wechat->setConfig();
+$this->wechat->config['wechat_jsApiSDK']=1;
+$this->wechat->jsApiSDK();
+?>
+<script type="text/javascript">
+    wx.ready(function() {});
+//    从本地选择图片
+    function chooseImage(self){
+        var lenth=self.maxLength-self.imgLength;
+        wx.chooseImage({
+            count:lenth , // 最大能上传数量-已传商品数量
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+//                将本地的localIds展示出来
+                res.localIds.map(function(item){
+                     //直接上传图片
+                    self.img.push(item);
+                    wx.uploadImage({
+                        localId: item, // 需要上传的图片的本地ID，由chooseImage接口获得
+                        isShowProgressTips: 1, // 默认为1，显示进度提示
+                        success: function (res1) {
+                            self.imgLength++;
+                            self.choImg.push(res1.serverId);
+                            console.log(res1.serverId);
+                        }
+                    });
+                })
+
+            }
+        });
+    }
+    //图片预览功能
+    function perviewImg(item,self){
+        console.log(item);
+        wx.previewImage({
+            current: item, // 当前显示图片的http链接
+            urls: self.img // 需要预览的图片http链接列表
+        });
+    }
+    //开始录音
+    function startRecord(self){
+        wx.startRecord();
+        self.f=setInterval(function(){
+            self.startNum=(self.startNum+1)%4;
+            self.startSrc=self.img_arr[self.startNum];
+        },300)
+    }
+    //结束录音，获取语音信息
+    function stopRecord(self){
+        wx.stopRecord({
+            success: function (res) {
+                wx.uploadVoice({
+                    localId: res.localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                    success: function (res1) {
+                        clearInterval(self.f);
+                        self.localVoice=res.localId;
+                        self.voice=res1.serverId;
+                        self.voiceState=3;
+                    }
+                });
+            }
+        });
+        wx.onVoiceRecordEnd({
+            // 录音时间超过一分钟没有停止的时候会执行 complete 回调
+            complete: function (res) {
+                wx.uploadVoice({
+                    localId: res.localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                    success: function (res1) {
+                        clearInterval(self.f);
+                        self.localVoice=res.localId;
+                        self.voice=res1.serverId;
+                        self.voiceState=3;
+                    }
+                });
+            }
+        });
+    }
+    //播放录音的函数
+    function playVoice(self){
+        if(self.pause){
+            wx.pauseVoice({
+                localId: self.localVoice // 需要暂停的音频的本地ID，由stopRecord接口获得
+            });
+            clearInterval(self.v);
+            self.startSrc1="/views/mobile/skin/default/image/jmj/comment/003.png";
+            self.pause=false;
+        }else{
+            wx.playVoice({
+                localId: self.localVoice // 需要播放的音频的本地ID，由stopRecord接口获得
+            });
+            self.v=setInterval(function(){
+                self.startNum=(self.startNum+1)%4;
+                self.startSrc1=self.img_arr[self.startNum];
+            },300);
+            self.pause=true;
+        }
+    }
+
+</script>
+{/if}
+
+
+</body>
+</html>

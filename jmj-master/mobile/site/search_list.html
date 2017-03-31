@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>九猫大百货</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/searth_list.css?v=<?php echo time(); ?>" />
+    <script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+</head>
+<body>
+<!--loading页结束-->
+<div id="searth_container">
+    <loadding :mes="showloadding"></loadding>
+    <search-nav :search="search" :val="searth_word"></search-nav>
+    <template v-if="showMessage && infoMessage.goods==''&&infoMessage.article==''" v-cloak>
+        <div class="empty">
+            <img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;">
+            <div class="content">暂时没有你想要搜索的商品</div>
+            <a href="{url:/site/index}" class="gotoFind locationA">去逛逛</a>
+        </div>
+    </template>
+    <div class="searth_container_content" v-else>
+        <div class="head">
+            <template v-if="state==0">
+                <div class="item itemTop0 left active"   @click="changeSearth(0)">商品</div>
+                <div class="item itemTop1 right"   @click="changeSearth(1)">内容</div>
+            </template>
+            <template v-else>
+                <div class="item itemTop0 left"   @click="changeSearth(0)">商品</div>
+                <div class="item itemTop1 right active"   @click="changeSearth(1)">内容</div>
+            </template>
+            <!--判断初始状态结束-->
+        </div>
+        <div class="bg"></div>
+        <template v-if="state==0">
+                <template v-if="showMessage && infoMessage.goods==''">
+                    <div class="emptysearth_container">
+                        <img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;">
+                        <div class="content">
+                            <span>~</span>
+                            <span>暂时没有你所要搜索的商品</span>
+                            <span>~</span>
+                        </div>
+                    </div>
+                </template>
+                <template v-else v-cloak>
+                    <div class="searth_goods">
+                        <div class="product_item" :id="item.idName" v-for="item in new_info_goods">
+                            <a :href="item.url" class="locationA">
+                                <div class="img">
+                                    <img  src="/views/mobile/skin/default/image/jmj/icon/bg_lazy.jpg" alt="" :dataimg="item.img"  class="samLazyImg" />
+                                </div>
+                                <div class="content">
+                                    <div class="name">
+                                        {{item.name}}
+                                    </div>
+                                    <div class="price">
+                                        <span class="sellprice">¥{{item.sell_price}}</span>
+                                        <span class="japanprice">日本价:{{item.jp_price}}円</span>
+                                        <span class="openprice">国内价：¥{{item.market_price}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flexbox empty_product" v-if="empty">
+                        <div class="img">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/nomore.png" alt=""/>
+                        </div>
+                        <div class="content">
+                            <span>~</span>
+                            <span>憋拉了，到底了</span>
+                            <span>~</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:0.5rem;height:1rem"></div>
+                </template>
+        </template>
+        <template v-else>
+                <template v-if="showMessage && infoMessage.article==''">
+                    <div class="emptysearth_container">
+                        <img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;">
+                        <div class="content">
+                            <span>~</span>
+                            <span>暂时没有你想要搜索的内容</span>
+                            <span>~</span>
+                        </div>
+                    </div>
+                </template>
+                <template v-else v-cloak>
+                    <div class="searth_article">
+                        <div class="article_item" v-for="item in new_article_goods">
+                            <div class="text">
+                                <a :href="item.url" class="locationA">
+                                    <div class="img"><img :src="item.image" alt="" /></div>
+                                <div class="name">{{item.title}}</div></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flexbox empty_product over-article" v-if="empty">
+                        <div class="img">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/nomore.png" alt=""/>
+                        </div>
+                        <div class="content">
+                            <span>~</span>
+                            <span>憋拉了，到底了</span>
+                            <span>~</span>
+                        </div>
+                    </div>
+                    <div style="padding-bottom:0.5rem;height:1rem;background:#fff"></div>
+                </template>
+        </template>
+    </div>
+</div>
+<div class="fix-toTop hide">
+    <img src="/views/mobile/skin/default/image/jmj/icon/top-icon.png" alt=""  />
+</div>
+
+<!--头信息结束-->
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/template-native.js?v=<?php echo time(); ?>"></script>
+<!--搜索组件引入-->
+<script src="/views/mobile/components/search_nav.js?v=<?php echo time(); ?>"></script>
+<!--加载动画载入-->
+<script src="/views/mobile/components/loadding.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/lazyload.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/base64.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jiumao/common.js?v=<?php echo time(); ?>"></script>
+<script>
+    //页面加载完成后调用的功能
+    window.onload=function(){
+        $(".mui-placeholder span").eq(1).html(getItem("searth_word")).css("color","#3d4225");
+        mui('body').on('tap','.locationA',function(){document.location.href=this.href;});
+        //解决tab选项卡a标签无法跳转的问题
+        mui('body').on('tap','.mui-tab-item',function(){
+            if(!$(this).hasClass("mui-active")){
+                $(this).find(".mui-tab-label").addClass("tabBar_color");
+                document.location.href=this.href;
+            }
+        });
+        var state=getSession('searthState');
+        var wndObj=document.getElementsByTagName("body");
+        if(state==0){
+            wndObj[0].setAttribute("style","background:#f8f8f8")
+        }else{
+            wndObj[0].setAttribute("style","background:#fff");
+        }
+        //点击直达顶部
+        mui("body").on("tap",".fix-toTop",function(){
+            $("html,body").animate({scrollTop:0},0);
+            return false;
+        });
+    };
+    var vm = new Vue({
+        el: '#searth_container',
+        data: {
+            showloadding:false,
+            searth_word:getItem("searth_word"),
+            search:[],
+            page:1,
+            empty:false,
+            showMessage:false,
+            infoMessage:{
+                goods:[],
+                article:[]
+            },
+            state:getSession('searthState')
+        },
+        computed: {
+            searth_pla: function (){
+//              return getItem('placeHolder')+"件商品等你来搜";
+				return "圣诞神秘大礼等你来拿"
+            },
+            // 读取和设置
+            new_info_goods: function() {
+                var self=this.infoMessage.goods;
+                if(this.infoMessage.goods){
+                    this.infoMessage.goods.map(function(item){
+                        item.url="/site/products?id="+item.id;
+                        item.idName="product_item"+item.id;
+                    });
+                }
+                return  this.infoMessage.goods;
+            },
+            new_article_goods: function() {
+                var self=this.infoMessage.article;
+                if(this.infoMessage.article){
+                    this.infoMessage.article.map(function(item){
+                        item.url="/site/article_detail?id="+item.id;
+                        item.cls="item box favoriteArticle"+item.id;
+                    });
+                }
+                return  this.infoMessage.article;
+            }
+        },
+        mounted: function(){
+            var self=this;
+            hotSearth(self)
+            if(getSession("searth_answer")){
+                self.infoMessage=getSession("searth_answer");
+                self.page=getSession("searth_page");
+                console.log(self.page);
+            }else{
+                self.page=1;
+                getSearthList(self);
+            }
+        },
+        updated:function() {
+            lazyload.init({
+                anim:false,
+                selectorName:".samLazyImg"
+            });
+//            getScrollTop(); //记录位置函数，有个bug，当拉到底部的时候因位置冲突，滚动无效
+        },
+        methods: {
+            changeSearth: function (sta) {
+                var wndObj=document.getElementsByTagName("body");
+                this.state = sta;
+                pushSession("searthState", sta);
+                if(sta==1){
+                    wndObj[0].setAttribute("style","background:#fff");
+                }else{
+                    wndObj[0].setAttribute("style","background:#f8f8f8")
+                }
+                changeState(sta)
+            },
+            showSearth: function(){
+                getSearth();
+            }
+        }
+    })
+    function changeState(index){
+        $(".head .item").removeClass("active");
+        $(".itemTop"+index).addClass("active");
+//        $(".favorite_item").addClass("hide");
+//        $(".favorite_item").eq(index).removeClass("hide");
+    }
+    //上拉加载
+    var stop=true;
+    $(window).bind('scroll', function() {
+        if ($(window).scrollTop() + $(window).height() +600 >= $(document).height() && $(window).scrollTop() > 50) {
+            if(stop==true){
+                vm.showloadding=true;
+                stop=false;
+                getSearthList(vm);
+            }
+        }
+        if($(window).scrollTop()>100){
+            $(".fix-toTop").show();
+            $(".fix-toTop").css("position","fixed");
+        }else{
+            $(".fix-toTop").hide();
+            $(".fix-toTop").css("position","fixed");
+        }
+    });
+    function getSearthList(self){
+        mui.ajax('/apic/search', {
+            data:{
+                page:self.page,
+                word:getItem("searth_word")
+            },
+            dataType: 'json',
+            type: 'get',
+            timeout: 10000,
+            success: function (data) {
+                console.log(data);
+                self.showMessage = true;
+                self.showloadding=false;
+                self.overMessage=data;
+                for(var i=0;i<data.goods.length;i++){
+                    self.infoMessage.goods.push(data.goods[i]);
+                }
+                for(var j=0;j<data.article.length;j++){
+                    self.infoMessage.article.push(data.article[j]);
+                }
+                if(data.goods.length==0&&data.article.length==0){
+                    stop=false;
+                    self.empty=true;
+                }else{
+                    stop=true;
+                }
+                pushSession("searth_answer",self.infoMessage);
+                self.page++;
+                pushSession('searth_page',self.page);
+            },
+            error: function (xhr, type, errorThrown) {
+                //异常处理；
+                console.log(type);
+            }
+        });
+    }
+    function hotSearth(self){
+        mui.ajax('/apic/search_words',{
+            dataType:'json',//服务器返回json格式数据
+            type:'get',//HTTP请求类型
+            timeout:10000,//超时时间设置为10秒；
+            success:function(data){
+                self.search=data;
+            }
+        });
+    }
+</script>
+</body>
+</html>
+

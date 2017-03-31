@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>商品列表</title>
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+	<!--<link rel="stylesheet" href="/views/mobile/skin/default/css/app/sitemao1.css?v=<?php echo time(); ?>" />-->
+</head>
+<body>
+<section id="category" v-cloak>
+	<loadding :mes="state_"></loadding>	
+	<div id="category_third" >
+		<div class="product_item" v-for="item in brand_list">
+    		<goods_list :item="item"></goods_list>
+		</div>
+    	<div id="londing" v-if="longing"  style=" display:none;width:100%;display: block;margin: 0 auto;">
+	    	<img src="/views/mobile/skin/default/image/jmj/icon/longing.gif" style="width:6rem;display: block;margin: 0 auto;"/>
+	    </div>
+   </div>
+	<whether :state="infoState"></whether>
+</section>
+
+
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/lazyload.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/components/loadding.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/components/goods_more.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/components/Whether.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+
+ $(window).load(function(){
+        //解决tab选项卡a标签无法跳转的问题
+        mui('body').on('tap','a',function(){document.location.href=this.href;});
+    })
+	var stop=true;
+	var Request = new Object();
+    Request = GetRequest();
+    var tidOrder=Request["tid"];
+    var midOrder=Request["mid"];
+		var em = new Vue({
+			el:"#category",
+			data:{
+				tid:tidOrder,
+				mid:midOrder,
+				info:[],
+				info_str:"",
+				tre:"",
+				page:1,
+				stop:false,
+				infoState:false,
+				longing:false,
+				state_:true
+			},
+			computed:{
+				brand_list:function(){
+					this.info.map(function(item){
+						item.url="/site/products?id="+item.id;
+						
+					})
+					
+					document.title=this.tre;
+					return this.info;
+				},
+			},
+			mounted:function(){
+				var self = this;
+				if(getSession("goodsinfo")){
+					self.state_ = false;
+					self.info=getSession("goodsinfo");
+					self.page=getSession("goodspage")
+				}else{
+						self.page=1;
+						getActiveInfo(self);
+				}	
+				
+			},
+			updated:function() {
+				// 页面加载完成执行的函数;
+				lazyload.init({
+					anim:false,
+					selectorName:".samLazyImg",
+					
+				});
+				
+			},
+			methods:{
+
+			},
+		})
+		function getActiveInfo(self){
+			mui.ajax('/apic/goods_more', {
+				data:{
+					tid:self.tid,
+					mid:self.mid,
+					page:self.page
+				},
+				dataType: 'json',
+				type: 'get',
+				timeout: 10000,
+				success: function(data){
+					self.state_ = false;
+//					console.log(data)
+					data.goods_list.map(function(item){
+						self.info.push(item);
+					})
+					
+					pushSession("goodsinfo",self.info)
+					self.tre = data.title;
+					if(data.goods_list==''){
+						self.infoState=true;
+	                    stop=false;
+	                    self.longing = false
+	               }else{
+	                	self.infoState=false;
+	                    stop=true;
+	                   	self. longing=true;
+	                   	self.page++;
+	                	pushSession("goodspage",self.page)
+	                }
+	                
+	               
+				}
+
+			});
+		};
+
+
+$(window).bind('scroll', function() {
+	if ($(window).scrollTop() + $(window).height() +1000 >= $(document).height() && $(window).scrollTop() > 50) {
+        if(stop==true){
+            stop=false;
+            longing=true;
+            em.state_ = true;
+            getActiveInfo(em);
+            
+        }else{
+        }
+   }
+});
+
+ //	获取url传递过来的参数
+    function GetRequest() {
+      var url = location.search; //获取url中"?"符后的字串
+      var theRequest = new Object();
+      if (url.indexOf("?") != -1) {
+          var str = url.substr(1);
+          strs = str.split("&");
+          for(var i = 0; i < strs.length; i ++) {
+              theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+          }
+      }
+      return theRequest;
+    };
+   
+		//			缓存
+    function pushSession(key,value){
+        var val=JSON.stringify(value)?JSON.stringify(value):[];
+        if(window.sessionStorage){
+            sessionStorage.setItem(key,val);
+        }else{
+            console.log("无法使用缓存");
+            return "";
+        }
+    }
+    function getSession(key){
+        if(window.sessionStorage){
+            var state=sessionStorage.getItem(key)?sessionStorage.getItem(key):0;
+            return JSON.parse(state);
+        }else{
+            console.log("无法使用缓存");
+            return "";
+        }
+    }
+    function removeSessionItem(key){
+        window.sessionStorage.removeItem(key);
+    }
+
+
+</script>
+
+</body>
+</html>

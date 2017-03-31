@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="x5-orientation" content="portrait">
+	<title>确认订单</title>
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/app/shopcar.css?v=<?php echo time(); ?>" />
+	<script src="/views/mobile/javascript/orderFormClass.js?v=<?php echo time(); ?>"></script>
+</head>
+<body>
+<!--loading页开始-->
+<div id="loading">
+	<div class="spinner">
+		<div class="spinner-container container1">
+			<div class="circle1"></div>
+			<div class="circle2"></div>
+			<div class="circle3"></div>
+			<div class="circle4"></div>
+		</div>
+		<div class="spinner-container container2">
+			<div class="circle1"></div>
+			<div class="circle2"></div>
+			<div class="circle3"></div>
+			<div class="circle4"></div>
+		</div>
+		<div class="spinner-container container3">
+			<div class="circle1"></div>
+			<div class="circle2"></div>
+			<div class="circle3"></div>
+			<div class="circle4"></div>
+		</div>
+	</div>
+</div>
+<!--loading页结束-->
+<!--vue容器-->
+<div id="wareListShop" v-if="showMessage" v-cloak>
+
+    <top_back_car :msg="car_count"></top_back_car>
+	<template v-if="showMessage && infoMessage.addressList.length==0" v-cloak>
+		<a href="{url:/simple/addaddress}?from=cart2">
+			<div class="order_addAddr">
+				<div class="topImage"></div>
+				<div class="img">
+					<img src="/views/mobile/skin/default/image/jmj/icon/add.png" alt="" style="width:0.62rem;height:0.62rem;margin-left:0.2rem" />
+				</div>
+				<div class="tex">添加收货地址</div>
+				<div class="bottomImage"></div>
+			</div>
+		</a>
+	</template>
+	<template v-else>
+		<!--有地址-->
+		<a href="{url:/simple/addresslist}?rev=cart_order">
+			<div class="order_addAddr" v-cloak>
+				<div class="topImage"></div>
+				<div class="box" style="width:100%">
+					<div class="left">
+						<div class="head">
+							<span class="name">{{infoMessage.addressList[0].accept_name}}</span>
+							<span class="phone">{{infoMessage.addressList[0].mobile}}</span>
+						</div>
+						<div class="bottom hidewrap">
+							{{infoMessage.addressList[0].province_val}}{{infoMessage.addressList[0].city_val}}{{infoMessage.addressList[0].area_val}}{{infoMessage.addressList[0].address}}{{youbian}}
+						</div>
+					</div>
+					<div class="right flexbox">
+						<img src="/views/mobile/skin/default/image/jmj/cart/address.png" alt=""  style="width:0.86rem;height:0.86rem;"/>
+					</div>
+				</div>
+				<div class="bottomImage"></div>
+			</div>
+		</a>
+	</template>
+	<div class="part2" v-cloak>
+		<div class="goodsInfo">
+			<div class="top">
+				<img src="/views/mobile/skin/default/image/jmj/cart/plane.png" alt="" style="width:0.37rem;height:0.37rem;"/>
+				<span>东京直邮</span>
+			</div>
+		</div>
+		<div class="goodsList" v-for="item,key in sell">
+			<div class="boxItem" style="width:100%">
+				<div class="leftImg">
+					<img :src="item.img" alt=""  style="width:1.23rem;height:1.23rem"/>
+				</div>
+				<div class="right">
+					<div class="name">{{item.name}}</div>
+					<div class="size">
+						<span v-for="sizes,key in item.spec_array" style="font-size: 0.2rem;color: rgb(187, 187, 187);">
+							{{sizes}}<t v-if="key == '颜色'">色</t><t v-if="key == '尺寸'">码</t>
+							<span v-if=" key !='颜色' "  style="color: rgb(187, 187, 187);">
+								,
+							</span>
+						</span>
+					</div>
+
+					<div class="text">
+						<span class="sellprice">￥ {{item.sell_pri}}</span>
+						<span class="num">x {{item.count}}</span>
+						<span style="font-size: 0.2rem; color: #bbb;margin-left: 0.5rem;">计重{{item.weight}}g</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="box totalItemCal" style="width:100%">
+			<div class="left">商品金额</div>
+			<div class="right">￥ {{infoMessage.sum}}</div>
+		</div>
+		<div class="box totalItemCal" style="width:100%">
+			<div class="left">订单邮费</div>
+			<div class="right">￥ {{infoMessage.delivery_money}}</div>
+		</div>
+		<div class="box totalItemCal" style="width:100%">
+			<div class="left">优惠券</div>
+			<div class="right" @click="showCode">选择优惠券
+				<img src="/views/mobile/skin/default/image/jmj/cart/right.png" alt="" :style="showCodeState?code.style1:code.style2"/>
+			</div>
+		</div>
+		<!--用户点击显示的页面-->
+		<div class="showContent" v-if="showCodeState">
+			<div class="box getCode" style="width:100%" @click="promoCho">
+				<div class="left" style="color:#ff4aa0;font-size:0.3rem;">输入优惠码</div>
+				<div class="right">
+					<img src="/views/mobile/skin/default/image/jmj/cart/right.png" alt="" style="width:0.12rem;height:0.22rem;margin-left:0.13rem"/>
+				</div>
+			</div>
+			<div class="choCodeItem" v-for="item1 in codeMessage" @click="subMessCode(item1)">
+				<img :src="item1.cho==true?img1:img2" alt="" style=""/>
+				<span class="text">{{item1.name}} {{item1.msg}}</span>
+			</div>
+		</div>
+		<div class="box totalItemCal" style="width:100%">
+			<div class="left">实付额</div>
+			<div class="right">￥ {{lastPay}}</div>
+		</div>
+		<div class="tips">
+			<span class="first">安全提醒：</span>
+			<span>付款成功后，九猫家不会以付款异常,卡单,系统升级为由联系您，请勿泄露银行卡号,手机验证码,否则会造成钱款的损失。如有疑问咨询客服，谨防电话诈骗！</span>
+		</div>
+	</div>
+	<!--配送方式-->
+	<div class="box delivery" style="width:100%">
+		<div class="left" v-cloak>配送方式</div>
+		<div class="right" v-cloak>{{infoMessage.delivery[0].name}}</div>
+</div>
+	<div style="height:3rem;"  id="deliveryTest"></div>
+	<!--底部fixed定位-->
+	<form action='{url:/simple/cart3}' class="form" method='post' name='order_form'  id="testForm" :style="showFixed?styleFixed:styleStatic" v-cloak>
+		<!--输入框要提交项目-->
+		<input type='hidden' name='ticket_aid'  v-model="infoMessage.ticket.ticket_aid" />
+		<input type='hidden' name='ticket_did'  v-model="infoMessage.ticket.ticket_did" />
+		<input type='hidden' name='direct_gid'  v-model="infoMessage.gid" />
+		<input type='hidden' name='direct_type'  v-model="infoMessage.type" />
+		<input type='hidden' name='direct_num'  v-model="infoMessage.num" />
+		<input type='hidden' name='direct_promo'  v-model="infoMessage.promo" />
+		<input type='hidden' name='direct_active_id'  v-model="infoMessage.active_id" />
+		<!--解决没有收获地址的bug-->
+		<template v-if="infoMessage.addressList.length>0">
+			<input name="radio_address" type="hidden"  v-model="infoMessage.addressList[0].id" />
+		</template>
+		<input type="hidden" name="delivery_id" v-model="infoMessage.delivery[0].id" />
+		<input type='hidden'  name='accept_time' value='任意'  />
+		<input name="payment"  type="hidden"  v-model="infoMessage.payment[0].id" />
+		<!--提交项目结束-->
+		<div class="box totalItemCal" style="width:100%">
+			<div class="left" style="color: #bbb;font-size:0.24rem">共{{infoMessage.count}}件商品</div>
+			<div class="right"><span>合计: </span>￥{{lastPay}}</div>
+		</div>
+		<div class="flexbox" style="height:1.63rem">
+			<div class="top">
+				<img :src="showButton?img1:img2" alt="" @click="changeBg"/>
+				本人同意并接受 <a href="/site/agreement"><span style="color:#ff2f5c">《个人委托协议》 </span></a>和 <a
+					href="/site/agreement"><span  style="color:#ff2f5c">《用户协议》</span></a>
+			</div>
+			<div class="bottom" type="button" :style="showButton?bg1:bg"  @click="formSubmit(infoMessage.addressList)">
+				确认
+			</div>
+		</div>
+	</form>
+	<!--优惠券输入-->
+	<div id="sheet1" class="mui-popover mui-popover-action mui-popover-bottom">
+		<ul class="mui-table-view">
+			<div class="title">
+				输入优惠券
+			</div>
+			<a href="#sheet1" class="cancle_action"><img src="/views/mobile/skin/default/image/jmj/cart/action.png" alt="" class="delaction"/></a>
+			<div class="text">
+				<input type="number" v-model="promo.val"  id="promoInput" placeholder="请输入6位数字" @blur="hideKeyBoad" @focus="showKeyBoad">
+			</div>
+			<div class="button_s" :style="promo.val?promo.buttonBg:promo.buttonBg1" @click="proSub">
+				确认
+			</div>
+		</ul>
+	</div>
+	<!--优惠券输入结果-->
+	<!--激活码成功时候状态-->
+	<div id="sheet2" class="mui-popover mui-popover-action mui-popover-bottom">
+		<ul class="mui-table-view">
+			<div class="top">
+				<img src="/views/mobile/skin/default/image/jmj/cart/red-r.png" alt="" style="width:0.43rem;height:0.43rem;" />
+				<span>兑换成功</span>
+			</div>
+			<div class="middle">
+				<img src="/views/mobile/skin/default/image/jmj/cart/catgraw.png" alt="" style="width:0.94rem;height:0.51rem;margin-top:0.15rem" />
+			</div>
+			<div class="bottom">
+				喵喵已为您使用{{infoMessage.ticket.msg}}
+			</div>
+		</ul>
+	</div>
+	<!--激活码失败时候状态-->
+	<div id="sheet3" class="mui-popover mui-popover-action mui-popover-bottom">
+		<ul class="mui-table-view flexbox">
+			<img src="/views/mobile/skin/default/image/jmj/cart/cat.png" alt="" style="width:0.96rem;height:0.87rem;"/>
+			<span>{{error}}</span>
+		</ul>
+	</div>
+</div>
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jiumao/common.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jiumao/cartTwo.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/components/top_back.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+/*限时购活动*/
+body{
+    background:#f8f8f8;
+}
+.headerTitle{
+    height:1.06rem;
+    background:#efefef;
+}
+.headerTitle  .title{
+    -webkit-flex:1;
+    height:1.06rem;
+    position:relative;
+}
+.headerTitle  .title .time{
+    font-size:0.32rem;
+    color:#3d4245;
+    position:relative;
+    top:0.05rem;
+}
+.headerTitle  .title .tip{
+    position:relative;
+    top:-0.05rem;
+    width:100%;
+    text-align: center;
+    color:#bbb;
+    font-size:0.28rem;
+}
+.headerTitle  .title.active{
+    background:#ff5959;
+}
+.headerTitle  .title.active div{
+    color:#fff;
+}
+.headerTitle  .title.active:after{
+    position:absolute;
+    content:'';
+    left:1.15rem;
+    bottom:-0.11rem;
+    width: 0;
+    height: 0;
+    border-left: 0.12rem solid transparent;
+    border-right: 0.12rem solid transparent;
+    border-top: 0.12rem solid #ff5959;
+}
+#timePurchasePage .content{
+    background:#fff;
+}
+ #timePurchasePage .content .top{
+     font-size:0.28rem;
+     color:#bbbbbb;
+     padding:0.3rem 0.2rem 0.2rem 0.2rem;
+ }
+#timePurchasePage .content .item{
+    height:2.93rem;
+    border-bottom:1px solid #d8d8d8;
+    display: -webkit-flex;
+    -webkit-justify-content: flex-start;
+}
+#timePurchasePage .content .item .img{
+    width:2.39rem;
+    height:2.93rem;
+    position:relative;
+}
+#timePurchasePage .content .item .img img{
+    width:2.15rem;
+    height:2.15rem;
+}
+#timePurchasePage .content .item .img .over_img{
+    width:1.6rem;
+    height:1.6rem;
+    position:absolute;
+    top:0.665rem;
+    left:0.395rem;
+}
+#timePurchasePage .content .item .text{
+    height:2.93rem;
+    padding:0.28rem;
+    width:5.11rem;
+}
+#timePurchasePage .content .item .text .name{
+    margin-top:0.05rem;
+    font-size:0.3rem;
+    color:#3d4245;
+    line-height:0.33rem;
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    height:0.64rem;
+}
+#timePurchasePage .content .item .box2{
+    margin-top:0.4rem;
+    height:0.34rem;
+    line-height:0.34rem;
+}
+#timePurchasePage .content .item .box2 .price1 span{
+    color:#ff2f5c;
+    font-size:0.24rem;
+}
+#timePurchasePage .content .item .box2 .price2 s{
+    color:#bbb;
+}
+#timePurchasePage .content .item .box2 .price2 span{
+    color:#bbb;
+    font-size:0.24rem;
+}
+/*剩余数量展示*/
+#timePurchasePage .content .item .bottom .num{
+    position:relative;
+    margin-top:0.37rem;
+    border:1px solid #ff6161;
+    border-radius:0.44rem;
+    width:1.95rem;
+    height:0.44rem;
+    line-height:0.43rem;
+    text-align:center;
+    overflow: hidden;
+    font-size:0.26rem;
+    color:#ff0000;
+    z-index:2;
+}
+#timePurchasePage .content .item .bottom .num span{
+    padding:0 0.12rem;
+    color:#ff0000;
+}
+#timePurchasePage .content .item .bottom .num .bg{
+    z-index:3;
+    background:rgba(255,89 ,89,0.3);
+    height:0.41rem;
+    border-radius:0.4rem 0 0 0.4rem;
+    position:absolute;
+    left:0;
+    bottom:0;
+}
+#timePurchasePage .content .item .bottom .buy{
+    margin-top:0.37rem;
+    background:#ff5959;
+    border-radius:0.48rem;
+    width:1.4rem;
+    height:0.48rem;
+    line-height:0.48rem;
+    text-align:center;
+    font-size:0.28rem;
+    color:#fff;
+    /*opacity:0.5;*/
+}
+
+
+
+
+
+
+/*.timePurchasePage .top{*/
+    /*background:#efefef;*/
+    /*width:100%;*/
+    /*height:1.06rem;*/
+/*}*/
+/*.timePurchasePage .top .item{*/
+    /*-webkit-flex:1;*/
+    /*position:relative;*/
+/*}*/
+/*.timePurchasePage .top .time{*/
+    /*margin-top:0.18rem;*/
+    /*width:100%;*/
+    /*text-align:center;*/
+    /*font-family:'HelveticaNeueLt';*/
+    /*font-size:0.32rem;*/
+    /*color:#3d4245;*/
+/*}*/
+/*.timePurchasePage .top .state{*/
+    /*width:100%;*/
+    /*text-align:center;*/
+    /*font-size:0.28rem;*/
+    /*color:#bbbbbb;*/
+/*}*/
+/*.timePurchasePage .top .item.active{*/
+    /*background:#f70a7f;*/
+/*}*/
+/*.timePurchasePage .top .item.active div{*/
+    /*color:#fff;*/
+/*}*/
+/*.timePurchasePage .top .item.active:after{*/
+
+/*}*/
+/*.timePurchaseContent{*/
+    /*width:100%;*/
+    /*background:#fff;*/
+/*}*/
+/*.timePurchaseContent h6{*/
+    /*font-size:0.28rem;*/
+    /*color:#bbbbbb;*/
+    /*text-align:left;*/
+    /*padding:0.3rem 0 0 0.2rem;*/
+/*}*/
+/*.timePurchaseContent .img{*/
+    /*margin:0.38rem 0.12rem;*/
+/*}*/
+/*.timePurchaseContent .content{*/
+    /*width:4.74rem;*/
+    /*margin:0.25rem 0 0 0.4rem;*/
+/*}*/
+/*.timePurchaseContent .contentItem{*/
+    /*border-bottom:1px solid #eee;*/
+/*}*/
+/*.timePurchaseContent .content .name{*/
+
+    /*font-size:0.3rem;*/
+    /*color:#3d4245;*/
+    /*text-align:left;*/
+/*}*/
+/*.timePurchaseContent .content .price{*/
+    /*margin-top:0.28rem;*/
+/*}*/
+/*.timePurchaseContent .content .price .text1{*/
+    /*padding-top:0.14rem;*/
+    /*font-size:0.24rem;*/
+    /*color:#ff0000;*/
+/*}*/
+/*.timePurchaseContent .content .price .price1{*/
+    /*font-family:'HelveticaNeueLt';*/
+    /*font-size:0.34rem;*/
+    /*color:#ff44a0;*/
+    /*margin-left:0.14rem;*/
+/*}*/
+/*.timePurchaseContent .content .price .text2{*/
+    /*padding-top:0.14rem;*/
+    /*font-size:0.24rem;*/
+    /*color:#bbbbbb;*/
+    /*margin-left:0.38rem;*/
+/*}*/
+/*.timePurchaseContent .content .price .price_icon{*/
+    /*font-family:'HelveticaNeueLt';*/
+    /*font-size:0.3rem;*/
+    /*color:#ff44a0;*/
+/*}*/
+/*.timePurchaseContent .content .price .price2{*/
+    /*padding:0.14rem 0.24rem 0 0 ;*/
+    /*font-family:'HelveticaNeueLt';*/
+    /*font-size:0.24rem;*/
+    /*color:#bbbbbb;*/
+/*}*/
+/*.timePurchaseContent .content .num{*/
+
+/*}*/
+/*.timePurchaseContent .content .num .bg{*/
+
+/*}*/
+/*.timePurchaseContent .content .num .num1{*/
+    /*font-family:'HelveticaNeueLt';*/
+    /*font-size:0.34rem;*/
+    /*color:#ff0000;*/
+/*}*/
+/*.timePurchaseContent .content .text{*/
+    /*font-size:0.26rem;*/
+    /*color:#ff0000;*/
+/*}*/
+/*.timePurchaseContent .content .buy{*/
+    /*background:#ff4aa0;*/
+    /*box-shadow:0 0.02rem 0.04rem 0 rgba(255,73,160,0.50);*/
+    /*border-radius:0.04rem;*/
+    /*width:1.4rem;*/
+    /*height:0.48rem;*/
+    /*color:white;*/
+    /*text-align:center;*/
+    /*line-height:0.48rem;*/
+    /*margin:0.33rem 0.23rem 0 0;*/
+/*}*/
+/*.timePurchaseContent .content .buy.disabled{*/
+    /*opacity:0.5;*/
+/*}*/

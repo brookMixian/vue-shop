@@ -1,0 +1,998 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>商品详情</title>
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/icons-extra.css" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/app/products.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<section id="productInfo" v-cloak v-if="showMessage">
+	<top_back_car :msg="car_count"></top_back_car>
+	<div id="pullrefresh1" class="v-container" v-if="showContainer1" @touchstart="firstContainerMoveStart" @touchmove="firstContainerMove" @touchend="endtouch1">
+		<span @click="share" style="display: inline-block;position: fixed;right: 0;top: 1.02rem;z-index: 999;"><img src="/views/mobile/skin/default/image/jmj/product/shareMoney.png" style="width: 1.07rem;"/></span>
+		<div class="scro scro1" style="background:#fff">
+			<section style="" class="carousel flexbox">
+				<!--轮播开始-->
+				<div id="controllor" class="mui-slider">
+					<div class="mui-slider-group mui-slider-loop">
+						<div class="mui-slider-item mui-slider-item-duplicate flexbox">
+							<a href="#" class="inimg flexbox">
+								<img :src="showLastImg" class="indeximg"/>
+							</a>
+						</div>
+						<div class="mui-slider-item " v-for="(item,key) in info.photo">
+							<a href="#" class="inimg flexbox">
+								<img :src="item" class="indeximg">
+							</a>
+							<img v-if="info.delivery==1&&key==0" src="/views/mobile/skin/default/image/jmj/product/de.png" alt="" style="width:1.77rem;height:1.48rem;"  class="logoImg"/>
+						</div>
+						<div class="mui-slider-item mui-slider-item-duplicate flexbox">
+							<a href="#" class="inimg flexbox">
+								<img :src="info.photo[0]" class="indeximg">
+							</a>
+							<img v-if="info.delivery==1" src="/views/mobile/skin/default/image/jmj/product/de.png" alt="" style="width:1.77rem;height:1.48rem;"  class="logoImg"/>
+						</div>
+					</div>
+					<div class="mui-slider-indicator">
+						<div class="mui-indicator mui-active"></div>
+						<div class="mui-indicator" v-for="key in info.photo.length-1" v-if="key>0"></div>
+					</div>
+				</div>
+			</section>
+			<div id="time_buy" v-if="time_shop" @click="time_buy">
+				<p>{{time_title}}</p>
+				<div><span id="time_shop_buy">{{times}}</span></div>
+				<img src="/views/mobile/skin/default/image/jmj/product/timemore_pro.png" style="width: 0.13rem;"/>
+			</div>
+            <section class="name-price">
+				<div class="name hideCamp4">{{info.name}}</div>
+				<div class="price">
+					<div class="sell_price flexstart">
+						<span style="font-size:0.26rem;color:#ff2f5c">¥&nbsp;</span>
+						<span style="font-size:0.46rem;color:#ff2f5c"> {{info.sell_price}}</span>
+						<div class="act">
+							<img src="/views/mobile/skin/default/image/jmj/product/re.png" alt="">
+							<span>省 {{(info.market_price - info.sell_price).toFixed(2)}} 元</span>
+						</div>
+					</div>
+					<div class="cPrice">
+						<div style="display: -webkit-flex;-webkit-justify-content: center;">
+							<span class="chinaPrice">国内价： <s> {{info.market_price}}</s></span>
+							<span class="jaPrice">日本价：{{parseInt(info.jp_price)}} 円</span>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div style="height:0.2rem;background:#f5f5f5"></div>
+			<section class="dis">
+				<div class="text1">
+					<span>商品计重：</span>
+					<span>{{weight}}g</span>
+				</div>
+				<div class="text2">
+					<span>商品编号：</span>
+					<span>{{info.goods_no}}</span>
+				</div>
+			</section>
+			<a href="#serviceDescription">
+				<ul class="action1">
+					<li class="tip tip1">
+						<img src="/views/mobile/skin/default/image/jmj/product/tip1.png" alt="" />
+						<span>东京直邮</span>
+					</li>
+					<li class="tip tip2"  v-if="info.delivery==1">
+                        <!--"delivery":   //是否包邮[1满288包邮-2不包邮-3必包邮]-->
+						<img src="/views/mobile/skin/default/image/jmj/product/tip2.png" alt="" />
+						<span>满288包邮</span>
+					</li>
+					<li class="tip tip3" v-if="info.vendor==1">
+						<img src="/views/mobile/skin/default/image/jmj/product/tip3.png" alt="" />
+						<span>universal入驻</span>
+					</li>
+					<li class="right"><span class="mui-icon mui-icon-arrowright" style="color:#bbb;font-size:0.3rem;margin-right:0.25rem;"></span></li>
+				</ul>
+			</a>
+			<div style="height:0.2rem;background:#f5f5f5;" v-if="info.products_spec.length>0"></div>
+			<!--选择颜色尺码入口-->
+			<div class="box colorSize" v-if="info.products_spec.length>0" @click="popverCar(3)">
+				<div class="left">
+					选择<span v-for="item in info.products_spec" style="color:#1f1f1f">{{item.name}}</span>
+				</div>
+				<div class="right">
+					<span class="mui-icon mui-icon-arrowright" style="color:#bbb;font-size:0.3rem;margin-right:0.25rem;"></span>
+				</div>
+			</div>
+			<div></div>
+			<div style="height:0.2rem;background:#f5f5f5;"></div>
+			<!--关联品牌-->
+			<section class="relate relateBrand" v-if="info.brand.id" v-cloak>
+				<div class="top flexbox">
+					<span class="bg"></span>
+					<span class="text">相关品牌</span>
+					<span class="bg"></span>
+				</div>
+				<div  class="title boxcenter needClick" @click="brands">
+					<div class="left flexs">
+						<div class="img flexbox">
+							<img :src="info.brand.logo" alt="" style="width:1.2rem"/>
+						</div>
+						<div class="ti">
+							<div class="tit">{{info.brand.name}}</div>
+							<div class="num">共<span style="color:#ff2f5c">{{info.brand.count}}</span>件商品</div>
+						</div>
+					</div>
+					<div class="right">
+						查看品牌
+					</div>
+				</div>
+				<div class="dis hideCamp" v-html="info.brand.description" v-if="info.brand.description">
+                    <!--{{info.brand.description}}-->
+				</div>
+				<div class="brandlists">
+					<div class="mark">
+						<div class="detail" id="relatebrand">
+							<div class="content"  v-for="item in brandList">
+								<a  :href='item.url' class="item locationA">
+									<div class="img">
+										<img :src="item.img" alt=""/>
+									</div>
+									<div class="name hidewrap">
+										{{item.name}}
+									</div>
+									<div class="price hideCamp">
+										¥ {{item.sell_price}}
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div style="height:0.2rem;background:#f5f5f5;"></div>
+			<!--关联专辑-->
+			<section class="relate relateArticle" v-if="article.length>1" v-cloak>
+				<div class="top flexbox">
+					<span class="bg"></span>
+					<span class="text">相关专辑</span>
+					<span class="bg"></span>
+				</div>
+				<div class="articlelist">
+					<div class="mark">
+						<div class="con" id="relateArticle">
+							<div class="item" v-for="item in article">
+								<a :href="item.url" class="itemImg locationA"><img :src="item.image"/></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!--喵粉心得，待添加-->
+			<!--上拉进入商品详情-->
+			<section class="pull" :style="'-webkit-'+toBottom" v-if="showTop1">
+				<img src="/views/mobile/skin/default/image/jmj/product/pull.png" :style="'-webkit-'+(rotateState?styleTop2:styleTop1)" alt="" />
+				<div class="content">上拉加载商品详情</div>
+			</section>
+            <div style="height:1rem;background:#f5f5f5"></div>
+		</div>
+	</div>
+	<div id="pullrefresh2" class="v-container v-container2" v-if="showContainer2" @touchstart="secondContainerMoveStart" @touchmove="secondContainerMove" @touchend="endtouch2">
+		<div class="scro scro1" style="background:#f5f5f5;">
+			<div class="topTips" v-if="showTop" :style="topHeight">
+				<img src="/views/mobile/skin/default/image/jmj/product/pull.png" :style="'-webkit-'+(rotateState?styleTop1:styleTop2)" alt="" />
+				<span>下拉进入上一页</span>
+			</div>
+			<!--商品的图文详情-->
+			<section class="goodDet">
+				<!--无用的div,只是为了防止报错-->
+				<div class="top"></div>
+				<div class="top1">
+					商品图文详情 <img src="/views/mobile/skin/default/image/jmj/product/fanyi.png" alt="" style="width:1.64rem;" @click="getActsheet"/>
+				</div>
+				<div id="goodsContent" v-html="info.content">
+				</div>
+				<img src="/views/mobile/skin/default/image/xinzeng/fu1.png" style="width: 100%;display: block;" />
+				<img src="/views/mobile/skin/default/image/xinzeng/fu2.png" style="width: 100%;display: block;" />
+				<img src="/views/mobile/skin/default/image/xinzeng/fu3.png" style="width: 100%;display: block;" />
+				<img src="/views/mobile/skin/default/image/xinzeng/fu4.png" style="width: 100%;display: block;" />
+				<img src="/views/mobile/skin/default/image/xinzeng/authorization.jpg" alt="" style="width:100%;height:4.8rem;"/>
+				<img src="/views/mobile/skin/default/image/jmj/icon/shuoming.png" style="width: 100%;"/>
+			</section>
+			<!--服务承诺-->
+			<section class="sevicePer">
+				<div class="top">
+					服务承诺
+				</div>
+				<ul class="flexbox promise">
+					<li>
+						<img src="/views/mobile/skin/default/image/jmj/product/pri1.png"/>
+						<p>自营自采<br/>只有正品</p>
+					</li>
+					<li>
+						<img src="/views/mobile/skin/default/image/jmj/product/pri2.png"/>
+						<p>每日直邮<br/>安全快捷</p>
+					</li>
+					<li>
+						<img src="/views/mobile/skin/default/image/jmj/product/pri3.png"/>
+						<p>产品<br/>质量保障</p>
+					</li>
+				</ul>
+			</section>
+			<!--关联商品展示-->
+			<section class="relateGoods">
+				<div class="top">
+					喵粉都爱买
+				</div>
+				<goods_list :msg="relateList"></goods_list>
+			</section>
+			<div style="height: 0.9rem;">
+			</div>
+		</div>
+	</div>
+	<section>
+		<div class="footerBox">
+			<div class="collection" id="collection_state"  @click="Collection()" >
+				<img :src="info.is_favorite==0?img1:img2" alt="" class="collection_img"/>
+				<span class="collection_text" :style="info.is_favorite==0?style1:style2">{{info.is_favorite==0?text1:text2}}</span>
+			</div>
+			<div class="joinButton"><div  id="joinButton" @click="popverCar(1)">加入购物车</div></div>
+			<div class="buyBottom"><div   id="buyBottom" @click="popverCar(2)">立即购买</div></div>
+		</div>
+	</section>
+	<!--弹出购物车-->
+	<section id="select_product" class="mui-popover mui-popover-action mui-popover-bottom">
+		<div class="select_box">
+			<div class="select_top">
+				<div class="select_photo"><img :src="info.img"/></div>
+				<div class="select_top_right">
+					<div class="sel_title">
+                        <span class="price"><span style="color:#ff2f5c;font-size:0.26rem;">￥</span>{{info.sell_price}}</span>
+						<span class="storeNum" :data-store="info.store_nums">库存数量： {{info.store_nums}}</span>
+					</div>
+					<a href="#select_product" class="a_da"><span class="mui-icon mui-icon-closeempty"></span></a>
+				</div>
+			</div>
+			<!--选择颜色尺码-->
+			<div class="select_size" v-if="info.products_spec.length>0">
+				 <div class="size" v-for="(item,key) in info.products_spec">
+						<h4>{{item.name}}</h4>
+					 	<div class="cho_size">
+							<span  @click="changeSize(key,item1,item.name)" v-for="item1 in item.list" :class="item.cho==item1?'active':''">{{item1}}</span>
+						</div>
+				 </div>
+			</div>
+			<!--选择颜色尺码结束-->
+			<div class="select_center" :style="info.products_spec.length>0?'':'border-top:1px solid #eee'">
+				<h3 class="select_h3">数量</h3>
+				<div class="select_center_a">
+                    <img src="/views/mobile/skin/default/image/jmj/cart/ruduceable.png" alt="" class="reduce" style="width: 0.5rem; height: 0.5rem;" @click="modified(-1)" id="buyReduceButton" />
+                    <input type="number" readonly id="buyNums" v-model="goodsnum"  />
+                    <img src="/views/mobile/skin/default/image/jmj/cart/add.png" alt="" class="add" style="width: 0.5rem; height: 0.5rem;" @click="modified(1)" id="buyAddButton" />
+				</div>
+			</div>
+            <div class="contain flexbox" v-if="showCar!=3">
+                <button class="select_btn"  id="joinCarButton" v-if="showCar==1" @click="joinCar">确定</button>
+                <button class="select_btn"  id="buyNowButton"  v-if="showCar==2" @click="buyNow">立即购买</button>
+            </div>
+			<div class="colorSizePoper flexbox" v-if="showCar==3">
+					<div class="item left" @click="joinCar">加入购物车</div>
+					<div class="item right" @click="buyNow">立即购买</div>
+			</div>
+		</div>
+	</section>
+	<!--翻译弹出-->
+	<div id="sheet" class="mui-popover mui-popover-action mui-popover-bottom">
+		<ul class="mui-table-view">
+			<div class="title">
+				翻译结果
+			</div>
+			<div class="parent" @touchstart="moveStart" @touchmove="move">
+				<div class="text" :style="nowStyle">
+					正在翻译，请稍等...
+				</div>
+			</div>
+		</ul>
+		<div id="close" style="text-align:center">
+
+			<a href="#sheet" ><img src="/views/mobile/skin/default/image/jmj/icon/close.png"  style="width:0.62rem;margin-top:0.2rem;" ></a>
+		</div>
+
+	</div>
+</section>
+<section>
+	<!--服务说明弹出框-->
+	<div id="serviceDescription" class="mui-popover mui-popover-action mui-popover-bottom">
+		<div>服务说明<a href="#serviceDescription"><span class="mui-icon mui-icon-closeempty"></span></a></div>
+		<div class="descContent">
+			<p>
+				<img src="/views/mobile/skin/default/image/jmj/img/plane_icon.png"/>
+				<span>海外直邮</span>
+			</p>
+			<p>汇集日本本土尖货 千万人口碑信赖 价格透明 日本直邮 足不出户 轻松到手</p>
+		</div>
+		<div class="descContent">
+			<p>
+				<img src="/views/mobile/skin/default/image/jmj/img/shouhou.png"/>
+				<span>售后服务</span>
+			</p>
+			<p>目前不支持无理由退换货服务。出现包装破损或者内件破损，商品错发的情况请拍照联系客服核实。我们会及时处理您的退换货事宜。</p>
+		</div>
+		<div class="descContent">
+			<p>
+				<img src="/views/mobile/skin/default/image/jmj/img/wuliu1.png"/>
+				<span>物流配送说明</span>
+			</p>
+			<p>订单支付后2-3天日本供应链配货至中转仓；5-7天内从日本中转仓发至国内玖猫专线。正常情况下10-15天货物就会到您手上哦~</p>
+		</div>
+		<div class="descContent">
+			<p>
+				<img src="/views/mobile/skin/default/image/jmj/product/tip2.png"/>
+				<span>288包邮</span>
+			</p>
+			<p>单笔订单中的商品，显示“满288包邮”的商品，享受288包首重（500g），续重每增加100g收取运费5元。不显示“满288包邮”的商品，无法享受包邮服务，收取首重35元，续重每增加100g收取运费5元。</p>
+		</div>
+	</div>
+	<div id="backgrounds" style="width: 100%;display: none;height: 100%;background: #000;opacity: 0.5;position: absolute;left: 0;top: 0;z-index:10000;">
+		<div id="" class="tips">
+			<p style="font-size:0.30rem ;letter-spacing: 0.02rem;" >点击分享到朋友圈或好友,若好友在48小时内下单</p>
+			<p style="font-size:0.3rem ;letter-spacing: 0.02rem;">您将获得该笔订单金额的7%的现金提成。</p>
+			<p style="margin-top: 0.6rem;letter-spacing: 0.02rem;">(具体规则见 个人中心-分享赚钱页面)</p>
+			</div>	
+			<img id="hander" src="/views/mobile/skin/default/image/jmj/ticket_gain/hander.png" style="width: 0.56rem; height: 0.72rem;position: absolute;top: 0;right: 0.2rem;"/>
+			
+	</div>
+</section>
+
+<script src="/views/mobile/javascript/vue.js"></script>
+<script src="/views/mobile/javascript/jquery.min.js?"></script>
+<script src="/views/mobile/javascript/mui.js?"></script>
+<script src="/views/mobile/javascript/lazyload.js"></script>
+<script src="/views/mobile/javascript/jiumao/common.js"></script>
+<script src="/views/mobile/javascript/jiumao/wechat.js"></script>
+<script src="/views/mobile/components/top_back.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+<script src="/views/mobile/components/List_of_goods.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+var minutes,hours,seconds;
+	var statusOrder="{echo:IReq::get('id')}";
+	var time_all,times;
+	//记录访问位置的id
+	setItem("product",statusOrder);
+	var vm = new Vue({
+		el: '#productInfo',
+		data: {
+			time_shop:false,
+			times:"",
+			time_title:"",
+			baoyou:"",
+			showMessage:false,
+			showContainer1:true,
+			showContainer2:false,
+			info:{
+				photo:[{
+					img:''
+				}]
+			},
+			weight:"",
+			relateArticle:[],
+			img1:'/views/mobile/skin/default/image/jmj/product/remove.png',
+			img2:'/views/mobile/skin/default/image/jmj/product/already.png',
+			text1:'种草',
+			text2:'已种草',
+			style1:'color:#979797',
+			style2:'color:#ff4aa0',
+			showCar:'',
+			scroll:'',
+			nowTop:0,
+//            touch y轴坐标定义
+			py0:0,
+			py1:0,
+			xy0:0,
+			xy1:0,
+			pmy:0,
+            pm1:0,
+			checkScroll:false,//判定是否通过第二页进入第一页的
+			ckeckScroll1:false,//判定第一页进入第二页的状态
+			showTop:false,//第二页顶部状态  初始为false
+            showTop1:true, //第一页底部状态 初始为false
+			topHeight:"height:"+0+"px", //下拉的高度 与手指移动的位置差不多
+            toBottom:"height:"+1+"rem",//上拉的高度
+			styleTop1:"transform:rotate(0deg);",
+			styleTop2:"transform:rotate(180deg);",
+			rotateState:false,
+			car_count:0,
+			newTop:0,
+//			弹窗
+			y01:0,
+			y0:0,
+			y1:0,
+//			用户选择产品颜色  尺码
+			type:'goods',
+			choId:false,
+			goodsnum:1
+		},
+		computed: {
+			showLastImg:function(){
+				var len=this.info.photo.length-1;
+				return 	this.info.photo[len];
+			},
+//				滚动位置的样式
+			nowStyle:function(){
+				return "top:"+this.newTop+"px";
+			},
+			article: function(){
+				this.relateArticle.map(function(item){
+					item.url="/site/article_detail?id="+item.id;
+				});
+				return this.relateArticle;
+			},
+			brandList: function(){
+				if(this.info.brand){
+					this.info.brand.list.map(function(item){
+						item.url="/site/products?id="+item.id;
+					})
+					return this.info.brand.list;
+				}
+			},
+			relateList:function(){
+				this.info.related_list.map(function(item){
+					item.url="/site/products?id="+item.id;
+				});
+				return this.info.related_list;
+			},
+			spec: function(){
+				var arr=[];
+				for(var i in this.info.spec_array){
+					arr.push(obj[i])
+				}
+				arr.map(function(item){
+					item.size=item.value.split(",")
+				});
+				return arr;
+			}
+		},
+		mounted: function(){
+			var self=this;
+			getProductDetail(statusOrder,self);
+			car_shop_num(self);
+		},
+		updated:function() {
+			var gallery = mui('#controllor');
+			gallery.slider({
+				interval:2000//自动轮播周期，若为0则不自动播放，默认为0；
+			});
+			lazyload.init({
+				anim:false,
+				selectorName:".samLazyImg"
+			});
+//			状态判定代码
+			if(this.checkScroll){
+				var bott=getSession("ProductsScrollTop")-55;
+				$(window).scrollTop(bott)
+			}
+			if(this.checkScroll1){
+				$(window).scrollTop(0)
+			}
+		},
+		methods: {
+			//进入限时购
+			time_buy:function(){
+				window.location.href = "/site/time_purchase"
+			},
+			//分享
+			share:function(){
+				document.body.scrollTop = 0;
+				document.documentElement.scrollTop =0;
+				$(document).on('touchmove',function(event) { event.preventDefault(); }, false);
+				$("#backgrounds").css({
+					"display":"block"
+				});
+				document.getElementById("backgrounds").onclick = function(){
+					$(document).unbind('touchmove');
+					$("#backgrounds").css({
+							"display":"none"
+					})
+				}
+				
+			},
+			back:function(){
+			    if(this.showContainer1) window.history.back();
+                if(this.showContainer2){
+                    this.showContainer1=true;
+                    this.showContainer2=false;
+					this.checkScroll=false;
+                }
+			},
+			//第一个容器移动事件
+			firstContainerMoveStart:function(e){
+				var touch = e.targetTouches[0];
+				this.py0=touch.pageY;
+//				初始化代码
+				this.checkScroll=false;
+				this.checkScroll1=false;
+			},
+			firstContainerMove:function(e){
+//                e.preventDefault=false;
+				var touch = e.targetTouches[0];
+				this.py1=touch.pageY;
+                this.pm1=this.py1-this.py0;
+                var scrollTop=$(window).scrollTop();//窗口的滚动高度
+                var windowHeight=$(window).height(); //窗口的高度
+                var docHeight=$(document).height(); //文档的真实高度
+				var check=scrollTop+windowHeight-docHeight;
+                if(check>=0){
+					this.showTop1=true;
+					this.toBottom="height:"+1+"rem;max-height:1rem";
+				}
+				if((windowHeight+scrollTop-this.pm1)>(docHeight+50)&&this.pm1<0){
+//					e.preventDefault(); //阻止缺省事件
+					this.showTop1=true;
+					this.rotateState=true;
+					this.toBottom="transition:-webkit-transform 0.2s linear;height:"+1+"rem;max-height:1rem;";
+					pushSession("ProductsScrollTop",docHeight-windowHeight);
+				}else{
+					//回复默认事件
+                    this.rotateState=false;
+				}
+
+			},
+			endtouch1:function(e){
+                if(this.rotateState) {
+                    //如果滑动成立 跳入容器1 并且初始化容器
+                    this.showContainer2=true;
+                    this.showContainer1=false;
+                    this.showTop=false;
+                    this.showTop1=true;
+                    this.rotateState=false;
+                    this.topHeight="height:"+0+"px";
+                    this.toBottom="height:"+1+"rem";
+                    this.py0=0;
+                    this.py1=0;
+                    this.xy0=0;
+                    this.xy1=0;
+                    this.pmy=0;
+                    this.pm1=0;
+					//只有进入之后状态码才为true
+					this.checkScroll1=true;
+                }else{
+                    this.showTop1=true;
+                    this.toBottom="height:"+1+"rem";
+                }
+			},
+			secondContainerMoveStart:function(e){
+//				touch开始要重置状态
+				this.checkScroll1=false;
+				this.checkScroll=false;
+				var touch = e.targetTouches[0];
+				this.xy0=touch.pageY;
+			},
+			secondContainerMove:function(e){
+				var scrollTop=$(window).scrollTop();
+				var touch = e.targetTouches[0];
+				this.xy1=touch.pageY;
+				this.pmy=this.xy1-this.xy0;
+				if(this.pmy>0&&scrollTop==0){
+					e.preventDefault();
+					this.showTop=true;
+					this.topHeight="height:"+this.pmy+"px";
+					if(this.pmy>=45){
+						this.rotateState=true;
+						this.topHeight="height:"+this.pmy+"px;max-height:1rem";
+					}
+				}else{
+					//回复默认事件
+					e.preventDefault=false;
+				}
+			},
+			endtouch2: function(){
+				//触摸结束 如果触摸的高度<50则初始化 如果大于50则进入上一页
+				if(this.pmy<45){
+					this.showTop=false;
+					this.topHeight="height:"+0+"px"
+				};
+				//如果滑动
+				if(this.rotateState) {
+				    //如果滑动成立 跳入容器1 并且初始化容器
+                    this.showContainer2=false;
+					this.showContainer1=true;
+					this.checkScroll=true;
+					this.showTop=false;
+                    this.showTop1=true;
+					this.rotateState=false;
+					this.topHeight="height:"+0+"px";
+                    this.toBottom="height:"+1+"rem";
+                    this.py0=0;
+                    this.py1=0;
+                    this.xy0=0;
+                    this.xy1=0;
+                    this.pmy=0;
+                    this.pm1=0;
+				}
+			},
+			Collection: function(){
+				var self=this;
+				Collection1(self);
+			},
+			popverCar: function(num){
+				this.showCar=num;
+				mui("#select_product").popover('show');
+			},
+			modified: function(num){
+				this.goodsnum+=num;
+				if(this.goodsnum>this.info.store_nums){
+					this.goodsnum=parseInt(this.info.store_nums);
+					return false;
+				}
+				if(this.goodsnum<1){
+					this.goodsnum=1
+					return false;
+				}
+			},
+			joinCar: function(){
+				var self=this;
+				joinCartFun(self);
+			},
+			brands:function (e) {
+				removeSessionItem("pinpai_infolist");
+				removeSessionItem("pinpai_page");
+				console.log(e)
+				window.location.href="/site/brand_detail?id="+this.info.brand.id;
+			},
+			buyNow: function(){
+				var self=this;
+				buyNowFun(self);
+			},
+			//获取翻译的弹窗
+			getActsheet:function(){
+				mui("#sheet").popover('toggle');
+				translate.start()
+			},
+//			翻译弹窗事件
+			moveStart: function(ev){
+				this.y01=ev.touches[0].pageY;
+				this.y0=this.scroll;
+			},
+			move: function(ev){
+				var textTop=$('.text').height();
+				var par=$('.parent').height();
+				console.log(par+".."+textTop)
+				if(textTop>par){
+					this.y1=ev.touches[0].pageY;
+					this.scroll=this.y1-this.y01;
+					this.newTop=this.y0+this.scroll;
+					if(this.newTop>0){
+						this.newTop=0;
+					};
+					if((-par+textTop)<-this.newTop&&(-par+textTop)>0){
+						this.newTop=-textTop+par;
+					}
+				}
+			},
+			changeSize:function(key,size,name){
+				//判定选择尺寸 规格
+				var _this=this;
+				checkSize(_this,key,size,name);
+			}
+		}
+	});
+	
+	
+    //获取购物车数量
+	function car_shop_num(self){
+		$.ajax({
+			url:"/apic/cart_count",
+			 dataType:'json',//服务器返回json格式数据
+	        type:'get',//HTTP请求类型
+	        timeout:10000,//超时时间设置为10秒；
+			success:function(data){
+//				console.log(data);
+				self.car_count = data.data.car_count
+			}
+		})
+	}
+	
+	$(window).load(function(){
+		mui('body').on("tap",".locationA",function(){
+			window.location.href=this.href;
+		})
+		mui('body').on("tap",".needClick",function(){
+			this.click();
+		});
+	});
+	//在线翻译
+	var translate 	= {
+		loading 	 		: false,
+		start 				: function(){
+			var thisContentObj 		= $('#goodsContent');
+			var text 				= thisContentObj.text(); //原内容
+			translate.getTranslateApi(text);
+		},
+		getTranslateApi 	: function(text){
+			var url 			= '{url:site/translate}';
+			if(translate.loading == true) return false;
+			translate.loading = true;
+			$.post(url,{text:text},function(data,status){
+				if(status == 'success'){
+					translate.end(data);
+				}
+				translate.loading = false;
+			},'json');
+		},
+		end 				: function(data){
+			$('#sheet').find('.text').text(data);
+		}
+	}
+	function getProductDetail(obj,self){
+		var product_detail=obj;
+		mui.ajax('/apic/goods_detail',{
+			data:{id:product_detail},
+			dataType:'json',//服务器返回json格式数据
+			type:'get',//HTTP请求类型
+			timeout:10000,//超时时间设置为10秒；
+			success:function(data){
+				//轮播图展示页面
+				console.log(data.data);
+				if(data.data.speed == ""){
+					self.time_shop = false;
+				}else{
+					self.time_shop = true;
+				}
+				xian(self,data);
+
+				self.showMessage=true;
+				setItem("collection",data.data);
+				self.weight=parseInt(data.data.weight);
+				console.log(data.data.products_spec)
+				//如果没有规格 那商品的type类型为products
+				if(data.data.products_spec.length>0){
+					self.type='product'
+				}
+				data.data.products_spec.map(function(item){
+					item.cho=false;
+				});
+				self.info=data.data;
+				self.relateArticle=data.data.article_list;
+			}
+		});
+	}
+	function xian(self,data){
+		time_all = data.data.speed.end_time;
+		var datae = new Date();
+		// 结束时间
+		if(parseInt(data.data.speed.end_time) - parseInt(datae.getTime()/1000)<0){
+			self.time_title = "已结束";
+		}else{
+			self.time_title = "抢购中";
+			time_xian();
+		}
+		//开始时间
+		console.log();
+		var timestamp4 = new Date(parseInt(data.data.speed.start_time)*1000);//直接用 new Date(时间戳) 格式转化获得当前时间
+		if(parseInt(data.data.speed.end_time) - parseInt(datae.getTime()/1000)<0){
+			self.times = "明天再来";
+			clearInterval(times);
+		}
+		if(parseInt(data.data.speed.start_time) - parseInt(datae.getTime()/1000)>=0){
+			self.times = "今天"+timestamp4.toTimeString().substr(0, 8)+"开抢";
+		}else{
+			var end_ = parseInt(data.data.speed.end_time) - parseInt(datae.getTime()/1000);
+			minutes = parseInt(end_/60);
+			seconds = parseInt(end_%60);
+			// alert(theTime1+"-"+theTime);
+			if(minutes > 60) {
+				hours = parseInt(minutes/60);
+				minutes = parseInt(minutes%60);
+			}
+			if(hours > 24) {
+				data = parseInt(hours/24);
+				hours = parseInt(hours%24);
+			}
+
+
+			if(parseInt(hours)<10){
+				hours = "0"+parseInt(hours);
+			}
+			if(parseInt(minutes)<10){
+				minutes = "0"+parseInt(minutes);
+			}if(parseInt(seconds)<10){
+				seconds = "0" + parseInt(seconds);
+			}
+			self.times = "结束倒计时 "+hours+":"+minutes+":"+seconds
+
+		}
+	}
+	//限时购
+	
+function time_xian(){
+	times = setInterval(function(){
+		var myDate = new Date();
+		var data_time = myDate.getTime();
+		var all_time1 = parseInt(time_all)-parseInt(data_time/1000);
+		if(all_time1<=0){
+			self.times = "明天再来";
+			clearInterval(tims)
+		}
+		if(all_time1 > 60) { 
+			minutes = parseInt(all_time1/60); 
+			seconds = parseInt(all_time1%60); 
+			// alert(theTime1+"-"+theTime); 
+			if(minutes > 60) { 
+			hours = parseInt(minutes/60); 
+			minutes = parseInt(minutes%60); 
+			if(hours>24) {
+				data = parseInt(hours/24);
+				hours = parseInt(hours%24);
+			}
+			
+			if(seconds<10){
+				seconds = "0"+seconds;
+			}if(minutes<10){
+				minutes = "0"+minutes;
+			}if(hours<10){
+				hours = "0"+hours;
+			}
+			if(document.getElementById("time_shop_buy")){
+				document.getElementById("time_shop_buy").innerHTML = "结束倒计时 "+hours+":"+minutes+":"+seconds;
+			}
+			else{
+				return;
+			}
+//			console.log(vm.times)
+			} 
+			
+		}
+		},1000)
+}
+	function Collection1(obj){
+		var data=getItem("collection");
+		mui.ajax('/simple/favorite_add/_paramKey_/_paramVal_',{
+			data:{
+				goods_id:data.id,
+				random:Math.random()
+			},
+			dataType:'json',//服务器返回json格式数据
+			type:'get',//HTTP请求类型
+			timeout:10000,//超时时间设置为10秒；
+			success:function(data){
+				console.log(data);
+				if(data.message==""){
+					obj.info.is_favorite=0;
+				}else{
+					obj.info.is_favorite=1;
+				}
+				console.log(obj);
+			}
+		});
+	}
+	//商品加入购物车
+	function joinCartFun(self)
+	{   var id,data1;
+		var buyNums   = self.goodsnum;
+		if(self.type=='goods'){
+			id      = self.info.id;
+		}else{
+			id     =self.choId
+		}
+		if(!id){
+			alert("请选择商品规格");
+			return;
+		};
+		data1=id+":"+buyNums+":"+self.type;
+		console.log(data1);
+		mui.ajax({
+			data:{
+				goods:data1
+			},
+			url:"/apic/cart_join",
+			dataType:'json',//服务器返回json格式数据
+			type:'get',//HTTP请求类型
+			timeout:10000,//超时时间设置为10秒；
+			success:function(data){
+				self.ajaxButton=true;
+				if(data.code!=0){
+					alert(data.msg);
+					return false;
+				}
+				flyCart(self);
+				self.car_count+=buyNums;
+			}
+		})
+	}
+	function buyNowFun(self)
+	{
+		var id;
+		//设置必要参数
+		var buyNums = self.goodsnum;
+		var storeNum=self.info.store_nums;
+		if(storeNum==0||buyNums>storeNum){
+			alert("你所购买的商品库存不足")
+			$('#buyNums').val(storeNum);
+			return;
+		}
+		if(self.type=='goods'){
+			var id      = self.info.id;
+		}else{
+			     id     =self.choId
+		}
+		if(!id){
+			  alert("请选择商品规格");
+			return;
+		};
+		//普通购买
+		var url = "/simple/cart2?id="+id+"&num="+buyNums+"&type="+self.type;
+		//页面跳转
+		window.location.href = url;
+	}
+	//    实现商品飞入购物车函数
+	function flyCart(){
+		var cartPosition,top,pro,cloneDiv,scrollTop;
+//        定义购物车的位置
+		cartPosition=$("#cart").offset();
+		scrollTop=$(window).scrollTop();
+//        定义商品图片的位置
+		pro=$(".select_photo").offset();
+		top=pro.top+cartPosition.top-scrollTop*2;
+		//克隆div实现动画
+		cloneDiv=$(".select_photo").clone();
+		$(".select_photo").parent().append(cloneDiv);
+		cloneDiv.addClass("rotate").animate({
+			left: cartPosition.left,
+			top:-top,
+			width:0,
+			height:0,
+		},"slow",function(){
+			cloneDiv.remove();
+            mui("#select_product").popover('hide');
+		});
+	}
+
+	function checkSize(_this,key,size,name){
+		var l=_this.info.products_spec.length;
+		var temp=_this.info.products_spec[key].cho;
+		_this.info.products_spec[key].cho=size;
+		_this.info.products.map(function(item){
+			var str1,str2;
+			 for(var i=0;i<l;i++){
+				 str1+=item.spec_array[i].value;
+				 str2+=_this.info.products_spec[i].cho
+			 }
+			 if(str1===str2){
+			 	if(item.store_nums>0){
+					_this.choId=item.id;
+					_this.info.store_nums=item.store_nums;
+					_this.info.sell_price=item.sell_price;
+					_this.info.weight=item.weight;
+				}else{
+					_this.info.products_spec[key].cho=temp;
+					alert("该商品库存不足")
+				}
+			 }
+		})
+	}
+</script>
+<!-- 微信分享 -->
+{if:IClient::isWechat() == true}
+<?php
+	require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+	$this->wechat = new wechat();
+$this->wechat->setConfig();
+$this->wechat->config['wechat_jsApiSDK']=1;
+$this->wechat->jsApiSDK();
+?>
+<script type="text/javascript">
+	var wechat_share = {
+		title       : '九猫大百货-日本同价-东京直邮', //标题
+		desc        : '{$name}', //描述
+		link        : "{echo:IWeb::$app->config['image_host1'] . '/site/products?id='.$this->product_id.'&sid='.$this->user['user_id'].'_'.$goods_no}",
+		imgUrl      : "{$img}", //图片
+	}
+	wechat.share();
+</script>
+{/if}
+
+</body>
+</html>

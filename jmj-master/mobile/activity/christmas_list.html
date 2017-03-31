@@ -1,0 +1,341 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>活动专场</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/jiumao.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/christmas_list.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<div id="activityInfo" v-cloak>
+     <header class="banner">
+         <img :src="banner.img" alt="" />
+     </header>
+    <section class="goodsList">
+        <div class="goodsItem" v-for="item in new_info">
+            <a :href="item.url" class="classA">
+                <div class="img flexbox">
+                    <img :src="item.img" alt="" />
+                </div>
+                <div class="text">
+                    <div class="name hideCamp">
+                        {{item.name}}
+                    </div>
+                    <div class="price box">
+                        <div class="price1"><span style="font-size:0.24rem;color:#ff82a0;padding-right:0.02rem;">¥</span>{{item.sell_price}}</div>
+                        <div class="price2"><span>原价：</span><s>{{item.original_price}}</s></div>
+                    </div>
+                    <div class="tip">
+                        <span>省</span>
+                        <span style="font-size:0.26rem;color:#ff82a0">{{item.diff_price}}</span>
+                        <span>元</span>
+                    </div>
+                    <div class="emp">
+
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+    <footer>
+        <div class="flexbox empty_product" style="background:#ff5151" v-if="infoState">
+            <div class="img">
+                <img src="/views/mobile/skin/default/image/jmj/icon/nomore.png" alt=""/>
+            </div>
+            <div class="content" v-cloak>
+                <span style="color:#fff">~</span>
+                <span style="color:#fff">憋拉了，到底了</span>
+                <span style="color:#fff">~</span>
+            </div>
+        </div>
+    </footer>
+	    <!-- 							回到顶部										-->
+	<div class="fix-toTop" @click="fan()" style="right: 0.5rem;">
+	    <img src="/views/mobile/skin/default/image/jmj/new_active/mainicon.png" alt="" style="width: 1.1rem;height: 1.1rem;" />
+	</div>
+	<div class="fix-toTop2" @click="fixToTop" style="position: fixed;right: 0.4rem;bottom: 1.6rem;">
+        <img src="/views/mobile/skin/default/image/jmj/icon/top-icon.png" alt="" style="width: 0.8rem;" />
+    </div>
+</div>
+
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript" charset="utf-8">
+    //	接收页面传过来的状态值
+    var banner={
+        	img:"",
+            title:"",
+            cid:'',
+            bid:'',
+            aid:"",
+            did:"",
+            page:1
+        }
+    var stop=true;
+    var Request = new Object();
+    Request = GetRequest();
+    var statusOrder=Request["id"];
+    var banner_data=getBanner(statusOrder);
+    console.log(banner_data);
+    var vm = new Vue({
+        el: '#activityInfo',
+        data: {
+            showMessage:false,
+            banner:banner_data,
+            page:1,
+            info:[],
+            infoState:false
+        },
+        computed: {
+            new_info: function(){
+                this.info.map(function(item){
+                    item.url="/site/products?id="+item.id;
+                })
+                return this.info;
+            }
+        },
+        mounted: function(){
+            var self=this;
+                getChristmasList(statusOrder,self);
+                document.title=self.banner.title;
+               
+        },
+      methods:{
+      		fan: function(){
+      			window.location.href = "/activity/christmas_index";
+      			console.log(1)
+      		},
+      		fixToTop: function(){
+	            $("html,body").animate({scrollTop:0},0);
+//	            return false;
+	        },
+        }
+    });
+
+    $(window).load(function(){
+        mui('body').on("tap",".classA",function(){
+            window.location.href=this.href;
+        });
+        mui('.mui-scroll-wrapper').scroll({
+            deceleration: 0.0005
+        });
+//
+    });
+    function getChristmasList(eid,self){
+        mui.ajax('/apic/activity_goods_list',{
+            data:self.banner,
+            dataType:'json',
+            type:'get',
+            timeout:10000,
+            success:function(data){
+                data.data.map(function(item){
+                    self.info.push(item);
+                });
+                pushSession("active_info",self.info);
+                if(data.data==''){
+                    self.infoState=true;
+                    stop=false;
+                }else{
+                    stop=true;
+                    self.infoState=false;
+                }
+                self.banner.page++;
+                pushSession("active_page",self.banner.page);
+                console.log(self.banner.page);
+            }
+        });
+    };
+    //上拉加载
+    $(window).bind('scroll', function() {
+        if ($(window).scrollTop() + $(window).height() +1000 >= $(document).height() && $(window).scrollTop() > 50) {
+            if(stop==true){
+                stop=false;
+                getChristmasList(statusOrder,vm);
+            }
+        }
+        if (document.body.scrollTop>50){
+            $(".fix-toTop").show();
+            $(".fix-toTop").click(function(){
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop =0;
+            })
+        }else{
+            $(".fix-toTop").hide()
+        }
+         if($(window).scrollTop()>100){
+	        $(".fix-toTop2").show();
+	        $(".fix-toTop2").css("position","fixed");
+	    }else{
+	        $(".fix-toTop2").hide();
+	        $(".fix-toTop2").css("position","fixed");
+	    }
+    });
+    //	获取url传递过来的参数
+    function GetRequest() {
+      var url = location.search; //获取url中"?"符后的字串
+      var theRequest = new Object();
+      if (url.indexOf("?") != -1) {
+          var str = url.substr(1);
+          strs = str.split("&");
+          for(var i = 0; i < strs.length; i ++) {
+              theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+          }
+      }
+      return theRequest;
+    }
+
+    //			缓存
+    function pushSession(key,value){
+        var val=JSON.stringify(value)?JSON.stringify(value):[];
+        if(window.sessionStorage){
+            sessionStorage.setItem(key,val);
+        }else{
+            console.log("无法使用缓存");
+            return "";
+        }
+    }
+    function getSession(key){
+        if(window.sessionStorage){
+            var state=sessionStorage.getItem(key)?sessionStorage.getItem(key):0;
+            return JSON.parse(state);
+        }else{
+            console.log("无法使用缓存");
+            return "";
+        }
+    }
+    function removeSessionItem(key){
+        window.sessionStorage.removeItem(key);
+    }
+    //获取banner图和title
+    function getBanner(id){
+        var id=id;
+        switch(id)
+        {
+        	 case "1":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/1-ed.jpg";
+                banner.title="药妆专区";
+                banner.cid='126';
+                banner.bid='';
+                banner.aid="";
+                 banner.page=1;
+                break;
+            case "2":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/2-ed.jpg";
+                banner.title="个护专区";
+                banner.cid='134';
+                banner.bid='';
+                banner.aid=""; banner.page=1;
+                break;
+            case "3":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/3-ed.jpg";
+                banner.title="宠物专区";
+                banner.cid='6';
+                banner.bid='';
+                banner.aid=""; banner.page=1;
+                break;
+            case "4":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/4-ed.jpg";
+                banner.title="健康专区";
+                banner.cid='2';
+                banner.bid='';
+                banner.aid=""; banner.page=1;
+                break;
+            case "5":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/5-ed.jpg";
+                banner.title="零食专区";
+                banner.cid='7';
+                banner.bid='';
+                banner.aid=""; banner.page=1;
+                
+                break;
+            case "6":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/6-ed.jpg";
+                banner.title="大牌专场";
+                banner.cid='';
+                banner.bid='26,32,56,74,78,82,100';
+                banner.aid=""; banner.page=1;
+                break;
+            case "7":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/7-ed.jpg";
+                banner.title="聚划算专场";
+                banner.cid='';
+                banner.bid='';
+                banner.aid="2"; banner.page=1;
+                break;
+            case "8":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/8-ed.jpg";
+                banner.title="狗子推荐";
+                banner.cid='126';
+                banner.bid='';
+                banner.aid="";
+                banner.did="4"; banner.page=1;
+                break;
+            case "9":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/9-ed.jpg";
+                banner.title="奶糖推荐";
+                banner.cid='134';
+                banner.bid='';
+                banner.aid="";
+                banner.did="4"; banner.page=1;
+                break;
+            case "10":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/10-ed.jpg";
+                banner.title="腿毛推荐";
+                banner.cid='6';
+                banner.bid='';
+                banner.aid="";
+                banner.did="4"; banner.page=1;
+                break;
+            case "11":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/11-ed.jpg";
+                banner.title="昔君推荐";
+                banner.cid='2';
+                banner.bid='';
+                banner.aid="";
+                banner.did="4"; banner.page=1;
+                break;
+            case "12":
+                banner.img="/views/mobile/skin/default/image/jmj/new_active/banner/12-ed.jpg";
+                banner.title="一哥推荐";
+                banner.cid='7';
+                banner.bid='';
+                banner.aid="";
+                banner.did="4"; banner.page=1;
+                break;
+            default:
+               break;
+        }
+        return banner;
+    }
+</script>
+
+<!-- 微信分享 -->
+{if:IClient::isWechat() == true}
+<?php 
+    require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+    $this->wechat = new wechat();
+    $this->wechat->setConfig();
+    $this->wechat->config['wechat_jsApiSDK']=1;
+    $this->wechat->jsApiSDK();
+?>
+<script src="/views/mobile/javascript/jiumao/wechat.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript">
+var wechat_share = {
+    title: "我点燃新年爆竹获得了一份进口药妆、护理、零食大礼包，来看看你的手气！", //标题
+    desc: "听说很多好东西都不要钱，赶紧去抢！", //描述
+    imgUrl: "{echo:IWeb::$app->config['image_host'].'/views/mobile/skin/default/image/jmj/new_active/index/pic1.png'}", //图片
+    link: "{echo:IWeb::$app->config['image_host']}/activity/christmas_index?pid={$this->user['user_id']}&iid={echo:ISession::get('shop_identify_id')}",
+}
+wechat.share();
+</script>
+{/if}
+
+
+</body>
+</html>

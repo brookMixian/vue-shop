@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>元旦爆竹</title>
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>"/>
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/app/christmas_ticket.css?v=<?php echo time(); ?>"/>
+</head>
+<body>
+	
+	<div id="top">
+		<img src="/views/mobile/skin/default/image/jmj/new_active/xuyuan02-ed.png" style="width: 100%;"/>
+	</div>
+	<div id="top_two">
+		<img id="btn_img" src="/views/mobile/skin/default/image/jmj/new_active/xuyuan03-ed.png" style="width: 2.8rem;"/>
+	</div>
+	<!--<div id="main">
+		<img src="/views/mobile/skin/default/image/jmj/new_active/xuyuan_04.jpg"/>
+	</div>-->
+	<div id="foorter">
+		<span class="span1"><a href="/activity/christmas_index"><img src="/views/mobile/skin/default/image/jmj/new_active/fanhui.png" style="width: 5.4rem;"/></a></span>
+		<span class="span2"><img src="/views/mobile/skin/default/image/jmj/new_active/share.png" style="width: 5.4rem;"/></span>
+	</div>
+	<!--					弹	窗	处	理	领	奬													-->
+	<div id="backgrounds" style="position:relative;width: 100%;display: none;height: 100%;background: #000;opacity: 0.5;display: none;position: absolute;left: 0;top: 0;z-index: 88;">
+			<p style="position: absolute;top:1rem;z-index: 99;" class="tips">点击屏幕任意区域取消操作</p>
+			<img id="hander" src="/views/mobile/skin/default/image/jmj/ticket_gain/hander.png" style="width: 0.56rem; height: 0.72rem;position: absolute;top: 0;right: 0.2rem;"/>
+		</div>
+	<!--					弹	窗	处	理	领	奬								-->
+    <div id="PopupWindow" style="display: none;border-radius:20px;left: 3.8rem;">
+    	<div id="logo"><img id="giftBox" src="/views/mobile/skin/default/image/jmj/new_active/hander-ed.png" style="width: 2.6rem;height: 2.6rem;margin: 0 auto;"/></div>
+    	<div style="width: 100%;margin-bottom:0.8rem ;">
+    		<p v-if="info1" style="color:#ff6060;">{{aaa}}</p>
+    		<p><t>{{newactivity}}</t></p>
+    	</div>
+    	<span @click="tiao">去看看</span>
+    	<t style="width: 1px;height: 1.29rem;background: #fff; position: absolute;right:0.42rem ;top: 6.78rem; background: rgba(255,255,255,0.4);">
+    		<strong style="width: 0.5rem;height: 0.5rem;position: absolute;left: -0.25rem;top: 1.29rem;z-index: 88;">
+    			<img id="guan" src="/views/mobile/skin/default/image/jmj/ticket_gain/guan.png" style="width: 0.5rem;height: 0.5rem;"/>
+    		</strong>
+    	</t>
+    </div>
+    <div style="height: 0.05rem;">
+    	
+    </div>
+    <div id="bgg" style="width: 100%;height: 200%;background: #000;opacity: 0.5;display: none;position: absolute;left: 0;top: 0;z-index: 88;"></div>
+	<input type="hidden" id="inputs" value="{echo:IReq::get('pid')}" />
+	<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/christmas_ticket.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+	var oshareimg = document.getElementsByClassName("span2")[0]
+	oshareimg.onclick = function(){
+		document.body.scrollTop = 0;
+		document.documentElement.scrollTop =0;
+		$(document).on('touchmove',function(event) { event.preventDefault(); }, false);
+		$("#backgrounds").css({
+			"display":"block"
+		})	
+	}
+	document.getElementById("backgrounds").onclick = function(){
+				$(document).unbind('touchmove');
+				$("#backgrounds").css({
+						"display":"none"
+				})
+				
+			}
+	$("#bgg").click(function(){
+		$("#bgg").css({
+					"display":"none",
+					"overflow":"hidden"
+				})
+				$("#PopupWindow").css({
+					"display":"none",
+					"top": "-6.78rem"
+				});
+				$(document).unbind('touchmove');
+	})
+	</script>
+
+<!-- 微信分享 -->
+{if:IClient::isWechat() == true}
+<?php 
+    require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+    $this->wechat = new wechat();
+    $this->wechat->setConfig();
+    $this->wechat->config['wechat_jsApiSDK']=1;
+    $this->wechat->jsApiSDK();
+?>
+<script src="/views/mobile/javascript/jiumao/wechat.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript">
+var wechat_share = {
+	title: "我点燃新年爆竹获得了一份进口药妆、护理、零食大礼包，来看看你的手气！", //标题
+	desc: "听说很多好东西都不要钱，赶紧去抢！", //描述
+    imgUrl: "{echo:IWeb::$app->config['image_host'].'/views/mobile/skin/default/image/jmj/new_active/index/pic1.png'}", //图片
+    link: "{echo:IWeb::$app->config['image_host']}/activity/christmas_ticket?pid={$this->user['user_id']}&iid={echo:ISession::get('shop_identify_id')}",
+}
+wechat.share();
+</script>
+{/if}
+
+</body>
+</html>

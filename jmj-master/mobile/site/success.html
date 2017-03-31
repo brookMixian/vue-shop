@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>支付成功</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+    <style>
+        .top{
+            margin-top:1.22rem;
+        }
+        .top .tip{
+            font-weight:bold;
+            font-size:0.44rem;
+            color:#ff5959;
+            margin-left:0.2rem;
+            position:relative;
+            top:-0.05rem;
+        }
+       .circle{
+           display: inline-block;
+           background:#bbbbbb;
+           border-radius:0.035rem;
+           width:0.07rem;
+           height:0.07rem;
+           line-height:0.28rem;
+           position:relative;
+           top:0.3rem;
+           left:0.2rem;
+       }
+        ul{
+            list-style: none;
+            padding-top:0.5rem;
+        }
+        ul li .text{
+            display: inline-block;
+            font-size:0.22rem;
+            color:#3d4245;
+            line-height:0.38rem;
+            padding:0 0.28rem 0 0.4rem;
+        }
+        .addCredit{
+            display:block;
+            background:#ff5959;
+            border-radius:0.08rem;
+            width:5.5rem;
+            height:0.9rem;
+            line-height:0.9rem;
+            text-align:center;
+            font-size:0.32rem;
+            color:#ffffff;
+            margin-top:1.6rem;
+        }
+        .successPay{
+            display:block;
+            border:1px solid #ff5959;
+            border-radius:0.08rem;
+            width:5.5rem;
+            height:0.9rem;
+            line-height:0.9rem;
+            text-align:center;
+            font-size:0.32rem;
+            color:#ff5959;
+            margin-top:0.67rem;
+        }
+        .share{
+        	width: 100%;
+        	margin-top: 0.5rem;
+        	text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="top flexbox">
+        <div class="img"><img src="/views/mobile/skin/default/image/jmj/product/icon_sucess.png" alt="" style="width:0.64rem;0.64rem;"/></div>
+        <div class="tip">支付成功</div>
+    </div>
+    <div class="middle">
+        <ul>
+            <li><span class="circle"></span>
+                <span class="text">根据海关相关规定，购买跨境商品需要办理清关手续，需要您上传身份
+                证信息用于商品入境申报，真实的姓名和身份信息才能确保您的包裹顺
+                利通过海关检查。</span>
+            </li>
+            <li>
+                <span class="circle"></span>
+                <span class="text">
+                    声明：九猫家负责提交信息，并对您的身份信息保密，绝不传播或用于
+                其它地方，请放心填写。
+                </span>
+
+            </li>
+        </ul>
+    </div>
+    <div class="bottom flexbox">
+        <a href="{url:/simple/credit}" class="addCredit">添加身份证信息</a>
+        <a href="{url:/ucenter/order}?status=2" class="successPay">完成</a>
+    </div>
+    <div class="share">
+    	<a href="/site/order_share/share_no/<?php echo $_GET['share_no'] ?>"><img src="/views/mobile/skin/default/image/buy_share/success_share.png" style="width: 5.28rem;"/></a>
+    </div>
+<script>
+
+</script>
+</body>
+</html>
+

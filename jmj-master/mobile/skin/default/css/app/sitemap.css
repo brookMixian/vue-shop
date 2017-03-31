@@ -1,0 +1,242 @@
+body,html{
+	background: #fff;
+}
+li{
+	list-style: none;
+}
+.boximg{
+	width:7.5rem;
+	height:2.4rem;
+	overflow: hidden;
+}
+.boximg img{
+	width:100%;
+	height:2.4rem;
+}
+/*.boximg img:hover{
+	-webkit-transform:scale(1.2,1.2);
+	 -webkit-transition: transform 1s linear;
+}*/
+/*								分类 and 品牌									*/
+#main{
+/*	overflow: hidden;*/
+}
+#main-nav{
+	width: 100%;
+	height: 0.65rem;
+	display: -webkit-flex;
+}
+#main-nav .main-nav_left{
+	padding-left:2.48rem ;
+	padding-top:0.05rem ;
+}
+#main-nav .main-nav_right{
+	padding-left: 1.18rem;
+	padding-top:0.05rem ;
+}
+#main-nav p{
+	font-size:0.3rem;
+	color:#949494;
+	height: 0.5rem;
+	width: 0.66rem;
+	text-align: center;
+}
+#main-nav img{
+	display: block;
+	
+}
+
+/*						折叠							*/
+#main_content {
+	width: 100%;
+	overflow: hidden;
+}
+#main_content div div img{
+	display: block;
+}
+#main_content .public_main{
+	width: 100%;
+	overflow: hidden;
+	
+}
+#main_content .public_main h1{
+	width: 100%;
+	height: 0.7rem;
+	background: #f5f5f5;
+	color: #1f1f1f;
+	font-size: 0.28rem;
+	/*padding-left:0.8rem ;*/
+	position: relative;
+	line-height: 0.7rem;
+	text-align: center;
+	border-bottom: 1px solid #fff;
+}
+#main_content .public_main h1 img{
+	width: 0.6rem;
+	position: absolute;
+	left: 3rem;
+	top: 0.05rem;
+}
+#main_content .public_main ul{
+	width: 100%;
+	display: -webkit-flex;
+	-webkit-justify-content: flex-start;
+	flex-wrap: wrap;
+	padding-left: 0.2rem;
+}
+#main_content .public_main ul li{
+	width: 1.4rem;
+	
+}
+#main_content .public_main ul li p{
+	height: 0.58rem;
+	line-height: 0.58rem;
+	width: 100%;
+	text-align: center;
+	margin-bottom: 0.1rem;
+	font-size: 0.26rem;
+	color: #1f1f1f;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#main_content .public_main ul img{
+	width: 1.4rem;
+}
+#main_content .fl_list{
+	border-bottom:1px solid #eee;
+}
+#main_content .fl_list:last-of-type{
+	border: 0;
+}
+#active_show div{
+	border-bottom:1px solid #fff ;
+}
+#active_show div:last-of-type{
+	border: 0;
+}
+/*							品牌							*/
+#main_brand {
+	width: 100%;
+	overflow: hidden;
+	background: #fff;
+}
+#main_brand div div img{
+	display: block;
+}
+#main_brand .public_main{
+	width: 100%;
+	height: 0;
+	overflow: hidden;
+}
+.brand_list{
+	margin-top: 0.1rem;
+	width: 100%;
+}
+.brand_list_ul{
+	width: 100%;
+	display: -webkit-flex;
+	-webkit-flex-wrap: wrap;
+	-webkit-justify-content: flex-start;
+	padding-left:0.1rem ;
+}
+.brand_list_ul li{
+	margin-left:0.1rem 0.05rem;
+
+}
+
+/*									全部品牌								*/
+#brand_line{
+	width: 100%;
+}
+#brand_line .brand_top{
+	background:#f5f5f5;
+	width:100%;
+	height:0.7rem;
+	text-align: center;
+	line-height: 0.7rem;
+}
+#brand_line .brand_bottom{
+	width: 100%;
+}
+#brand_line .brand_bottom h1{
+	height: 0.7rem;
+	width: 7.11rem;
+	margin: 0 auto;
+	border-top:1px solid #B8B8B8 ;
+	border-bottom:1px solid #B8B8B8 ;
+	font-size:0.28rem;
+	color:#1f1f1f;
+	line-height: 0.7rem;
+}
+#brand_line .brand_bottom:nth-child(2) h1{
+	border-top:0;
+}
+#brand_line .brand_line_li{
+	width: 7.15rem;
+	margin: 0 auto;
+	padding-top:0.38rem ;
+	
+}
+#brand_line ul{
+	width: 100%;
+	display: -webkit-flex;
+	-webkit-flex-wrap: wrap;
+	-webkit-align-items: center;
+}
+#brand_line ul li{
+	margin-right:0.17rem ;
+	margin-bottom:0.2rem ;
+	padding:0.1rem;
+	width: 1.6rem;
+	height: 1.02rem;
+	overflow:hidden;
+	display: -webkit-flex;
+	align-items: center;
+	justify-content: center;
+}
+/*.public_main.jingzhi{
+	-webkit-animation:name1 0.5s linear ;
+}
+@-webkit-keyframes name1 {
+	from {
+		-webkit-transform: scale(1,0);
+		height:0;
+	}
+	to {
+		-webkit-transform: scale(1,1);
+		height:auto
+	}
+}*/
+/*						动画							*/
+/*#main #main_content .active{
+	animation: name1 1s;
+	overflow: hidden;
+}
+@-webkit-keyframes name1{
+	from{
+		transform: scaleX(0);
+		height: 0;
+	}
+	to{
+		transform: scaleX(1);
+		height: auto;
+	}
+}*/
+/*#main #main_content .jingzhi{
+	-webkit-animation:name2 2s;
+}
+@-webkit-keyframes name2{
+	0%{
+		-webkit-transform: scaleY(0);
+	}
+	100%{
+		-webkit-transform: scaleY(1);
+	}
+}*/
+/*						滑动							*/
+#wrap_list_{
+	position: absolute;
+	left: 0;
+	top: 0;
+}

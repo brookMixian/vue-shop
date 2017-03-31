@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>元旦好礼</title>
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>"/>
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/app/christmas_index.css?v=<?php echo time(); ?>"/>
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	<div id="wrap" v-cloak>
+		
+	
+	<div id="top">
+		<!--<a href="/activity/christmas_ticket"><img src="/views/mobile/skin/default/image/jmj/new_active/index1.jpg"/></a>-->
+		<!--<a href="/activity/christmas_grow"><img src="/views/mobile/skin/default/image/jmj/new_active/index2.jpg"/></a>-->
+		<!--<img src="/views/mobile/skin/default/image/jmj/new_active/index3.jpg"/>-->
+		<img src="/views/mobile/skin/default/image/jmj/new_active/index5-ed.png" style="width: 100;height: 9.85rem;"/>
+		<p style="left: 0.4rem;" @click="getTicket(15)"></p>
+		<p style="left: 2.8rem;" @click="getTicket(16)"></p>
+		<p style="left: 5.2rem;" @click="getTicket(17)"></p>
+		<!--<a href="/activity/christmas_ticket"><img src="/views/mobile/skin/default/image/jmj/new_active/index4.jpg"/></a>-->
+	</div>
+	<!--						导航					-->
+	<nav id="navdao" style="padding: 0.2rem 0;">
+		<ul>
+			<li v-for="catitem in newcat"><a :href="catitem.url">
+				<img :src="catitem.src"/>
+				<!--<span>{{catitem.name}}专区</span>-->
+			</a>	
+			</li>
+
+		</ul>
+	</nav>
+	<!--						banner图							-->
+	<div id="bannerbig">
+		<img src="/views/mobile/skin/default/image/jmj/new_active/bannerbig-ed.jpg" width="100%"/>
+	</div>
+	<!--			更多折扣				-->
+	<div id="zhe" class="">
+		<div id="zhe_ul" class="" >
+			<ul class="">
+				<li class="" v-for="(items,key) in newlist1" style="width: 3rem;"><a :href="items.url" style="display: block;">
+					
+					<p class="p1"><img :src="items.img" style="width: 1.8rem;height: 1.8rem;"/></p>
+					<p class="p2" style="margin-bottom:0.1rem ;color: #3D4245;font-size: 0.24rem;padding: 0 0.05rem;">{{items.name}}</p>
+					<p class="p3" style="margin-bottom: 0.15rem;">¥<span>{{items.sell_price}}</span></p>
+					<p class="p4">
+						<img src="/views/mobile/skin/default/image/jmj/new_active/921ED65A-23EE-47FE-B735-E47A8508FB2C@1x-ed.png" style="width: 0.44rem;"/>
+						<span style="display:block;text-align:center;position: absolute;top: 0.18rem;text-align: center;color: white;width: 0.44rem;display: block;"><t>{{key+1}}</t></span>
+					</p>
+				</a></li>
+
+			</ul>
+		</div>
+		<!--<div class="btn"><a href="#">更多折扣商品</a></div>-->
+	</div>
+	<!--			大牌专场					-->
+	<div id="dapai" class="t" v-for="(itemlist,key) in newlist">
+		<div class="top_img"><a :href="itemlist.url"><img :src="itemlist.bannerimg" style="width: 100%;"/></div></a>
+		<ul>
+			<li v-for="items in itemlist" style="height:auto"><a :href="items.url" >
+				<p class="p5"><img :dataimg="items.img" src="/views/mobile/skin/default/image/jmj/product/ware_lazy.png" alt="" class="samLazyImg"  style="width: 1.8rem;"/></p>
+				<p class="p6">{{items.name}}</p>
+				<div style="overflow: hidden;margin-left:0.09rem ;margin-top:0.11rem ;">
+					<p class="p7">¥ <span>{{items.sell_price}}</span></p>
+					<p class="p8">原价: <s>{{items.original_price}}</s></p>
+				</div>
+				<p class="p9" style="display:block;padding: 0;" :style="items.brand_logo?style1:style2">省 <span>{{items.diff_price}}</span> 元</p>
+				<p class="p10" v-if="items.brand_logo&&key==0"><img :src="items.brand_logo" style="width: 0.9rem;"/></p>
+			</a></li>
+			
+		</ul>
+	</div>
+	<footer>
+        <div class="flexbox empty_product" style="background: #ff5151;" v-if="">
+            <div class="img">
+                <img src="/views/mobile/skin/default/image/jmj/icon/nomore.png" alt=""/>
+            </div>
+            <div class="content">
+                <span style="color:#fff">~</span>
+                <span style="color:#fff">憋拉了，到底了</span>
+                <span style="color:#fff">~</span>
+            </div>
+        </div>
+    </footer>
+	</div>
+	<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/lazyload.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/christmas_index.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+
+
+<!-- 微信分享 -->
+{if:IClient::isWechat() == true}
+<?php 
+    require_once __DIR__ . '/../../../../plugins/wechat/wechat.php';
+    $this->wechat = new wechat();
+    $this->wechat->setConfig();
+    $this->wechat->config['wechat_jsApiSDK']=1;
+    $this->wechat->jsApiSDK();
+?>
+<script src="/views/mobile/javascript/jiumao/wechat.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript">
+var wechat_share = {
+	title: "我点燃新年爆竹获得了一份进口药妆、护理、零食大礼包，来看看你的手气！", //标题
+	desc: "听说很多好东西都不要钱，赶紧去抢！", //描述
+    imgUrl: "{echo:IWeb::$app->config['image_host'].'/views/mobile/skin/default/image/jmj/new_active/index/pic1.png'}", //图片
+    link: "{echo:IWeb::$app->config['image_host']}/activity/christmas_index?pid={$this->user['user_id']}&iid={echo:ISession::get('shop_identify_id')}",
+}
+wechat.share();
+</script>
+{/if}
+
+	
+</body>
+</html>

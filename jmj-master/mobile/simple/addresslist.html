@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>收货地址</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/icons-extra.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/jiumao.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.picker.min.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.poppicker.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/style.min.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<section id="addrList" v-cloak v-if="showmessage">
+    <div id="addressList">
+        <div class="addressListMenu">
+            <div class="menuList" v-for="item in newList">
+                <div class="top box">
+                    <div class="name">{{item.accept_name}}</div>
+                    <div class="phone">{{item.mobile}}</div>
+                </div>
+                <div class="addr">
+                    {{item.province_val}}{{item.city_val}}{{item.area_val}}{{item.address}}
+                </div>
+                <div class="box edit">
+                    <div class="is_default" v-if="item.is_default==1">
+                        <img src="/views/mobile/skin/default/image/jmj/icon/choose.png" alt="" />
+                        <span>收货地址</span>
+                    </div>
+                    <!--非默认地址-->
+                    <div class="no_default" @click="changeDefault(item)" v-else>
+                        <img src="/views/mobile/skin/default/image/jmj/icon/circle.png" alt="" />
+                        <span>设为收货地址</span>
+                    </div>
+                    <div class="isEdit box">
+                        <a :href="item.href"><div class="editAddr">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/editaddr.png" alt="" />
+                            <span>编辑</span>
+                        </div></a>
+                        <div class="del"  v-if="item.is_default!=1" @click="del(item)">
+                            <img src="/views/mobile/skin/default/image/jmj/icon/del.png" alt="" />
+                            <span>删除</span>
+                        </div>
+                    </div>
+                </div>
+                <!--编辑收货地址模态框-->
+                <div :id="item.href1" class="mui-modal" style="height: 8rem;">
+                   <!--<div class="" style="background:#f8f8f8">-->
+                      <!--<div id="addressNew" >-->
+                            <div class="title">请填写你的真实姓名，否则订单无法发出!</div>
+                            <div class="name_user" >
+                                <input type="text" v-model="item.name">
+                            </div>
+                               <input type="hidden" class="mui-input-clear"  v-model="item.id">
+                                <input type="number" class="mui-input-clear"  v-model="item.mob" :id="item.mobileId">
+                                <input type="text" class="mui-input-clear" :value="item.text" :id="item.userCityId" @focus="checkCity(item)" >
+                               <input type="text" class="mui-input-clear"  v-model="item.addr">
+                                <input type="number" class="mui-input-clear"  v-model="item.zi" >
+                                <input type="text" name="" :id="item.card" v-model="item.card" placeholder="收货人身份证号" />
+                                <div class="title"><span>收货人身份证正反面照片</span><span>请务必保证收货人姓名与身份证姓名一致!</span></div>
+                                <div id="cart">
+                                    <div class="left_cart" @click="upload_image(1,item)">
+                                        <div v-if="item.aaa"><img :src="item.aaa" class="sfz_image1" style="width: 100%;height: 100%" alt=""></div>
+                                        <div v-else><img src="/views/mobile/skin/default/image/jmj/icon/add.png" class="sfz_image1" style="width: 100%;height: 100%"/></div>
+                                        <p style="margin-top: 0.1rem; ">上传收货人身份正面</p>
+                                    </div>
+
+                                    <input type="hidden" class="mui-input-clear" v-model="item.aaaa">
+                                    <input type="hidden" class="mui-input-clear" v-model="item.aaa" id="aaa">
+                                    <div class="right_cart" @click="upload_image(2,item)">
+                                        <div v-if="item.bbb"><img :src="item.bbb" class="sfz_image2" style="width: 100%;height: 100%" alt=""></div>
+                                        <div v-else><img src="/views/mobile/skin/default/image/jmj/icon/add.png" class="sfz_image2" style="width: 100%;height: 100%"/></div>
+                                        <p style="margin-top: 0.1rem; ">上传收货人身份反面</p>
+                                    </div>
+                                    <input type="hidden" class="mui-input-clear" v-model="item.bbbb">
+                                    <input type="hidden" class="mui-input-clear" v-model="item.bbb" id="bbb">
+                                </div>
+                                <footer id="que_">
+                                    <div id="footer-fixed1">
+                                        <div class="newAddrSub2 newAddrSub_position">
+                                            <button   class="submit_suc" @click="editSubmit(item)">完成</button>
+                                        </div>
+                                    </div>
+                                </footer>
+                            <!--</div>-->
+
+					
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div id="footer-fixed" @click="addAddr">
+            <div class="newAddrSub">
+                <div id="submitaddr">添加收货地址</div>
+            </div>
+        </div>
+    </footer>
+</section>
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.picker.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.poppicker.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/city.data-3.js?v=<?php echo time(); ?>" type="text/javascript" charset="utf-8"></script>
+{if:common::jssdk()}
+{/if}
+<script>
+	$("input").focus(function(){
+      		$("#que_").css({
+      			"display":"none"
+      		})
+   });
+    $("input").blur(function(){
+			$("#que_").css({
+      			"display":"block"
+      		})
+	});
+    var cityPicker3;
+    var Request = new Object();
+    Request = GetRequest();
+    var statusOrder=Request["rev"];
+    console.log(statusOrder);
+    //	模拟高亮画面
+    var submitaddr1,pro,cit,are;
+    var vm= new Vue({
+        el:"#addrList",
+        data:{
+            showmessage:false,
+            info:[]
+        },
+        computed:{
+            newList:function(){
+                this.info.map(function(item){
+                    item.href="#modalid"+item.id;
+                    item.href1="modalid"+item.id;
+                    item.userCityId="usercity"+item.id;
+                    item.mobileId="mobile"+item.id;
+                    item.text=item.province_val+''+item.city_val+''+ item.area_val;
+//                    存入数值在编辑框,以免影响主地址页面数据展示
+                    item.name=item.accept_name;
+                    item.mob=item.mobile;
+                    item.addr=item.address;
+                    item.zi=item.zip;
+                    item.card=item.sfz_num;
+                    item.aaa='/'+item.sfz_image1;
+                    item.bbb='/'+item.sfz_image2;
+                    item.aaaa='/'+item.sfz_image1;
+                    item.bbbb='/'+item.sfz_image2
+                })
+                return this.info;
+            }
+        },
+        mounted:function(){
+            var self=this;
+            getAddressInfo(self);
+        },
+        methods: {
+            //设置默认地址功能
+            changeDefault: function(item){
+                changeDefault1(item)
+            },
+//            删除收货地址
+            del:function(item){
+                var self=this;
+                addressDel(item,self);
+            },
+//            新增收货地址页面
+            addAddr: function(){
+                if(statusOrder=="cart_order"){
+                    document.location.href="/simple/addaddress?rev=cart_order";
+                }else{
+                    document.location.href="/simple/addaddress";
+                }
+            },
+            //编辑收货地址页面
+//            更换城市页面
+            checkCity: function(item){
+                checkcity(item);
+            },
+//            更换完成之后的提交
+            editSubmit: function(item){
+                console.log(item);
+                changeAddr(item);
+            },
+            upload_image:function (num,item) {
+                var self=this;
+                wx.chooseImage({
+                    count: 1, // 默认9
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                        localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                        if(num==1){
+                            $('.sfz_image1').attr('src',localIds[0]);
+                        }else if(num == 2){
+                            $('.sfz_image2').attr('src',localIds[0]);
+                        }
+                        wx.uploadImage({
+                            localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                            isShowProgressTips: 1, // 默认为1，显示进度提示
+                            success: function (res) {
+                                var serverId = res.serverId; // 返回图片的服务器端ID
+//                        $(obj).next().attr('value',serverId)
+                                if(num==1 ){
+                                    if (serverId){
+                                        item.aaa = serverId;
+                                    } else {
+
+                                    }
+                                }else if(num == 2 ){
+                                    if (serverId){
+                                        item.bbb = serverId;
+                                    } else {
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    })
+    $(window).load(function(){
+        //    跳转到新增收货地址页面
+        //    三级联动
+        cityPicker3 = new mui.PopPicker({
+            layer: 3
+        });
+//        设置如果订单页面进入回退到订单页面，个人中心就回退到个人中心页面
+        pushHistory();
+        window.addEventListener("popstate", function(e) {
+            if(statusOrder=="cart_order"||statusOrder=="cart_order1"){
+                window.location.href=getItem("cart2url");
+            }else{
+                window.location.href='/ucenter/index';
+            }
+        }, false);
+    });
+    //获取收货地址列表
+    function getAddressInfo(self){
+        mui.ajax('/apic/address_list',{
+            dataType:'json',//服务器返回json格式数据
+            type:'get',//HTTP请求类型
+            timeout:10000,//超时时间设置为10秒；
+            success:function(data){
+                self.showmessage=true;
+                self.info=data;
+            }
+        });
+    }
+    function checkcity(item){
+        document.activeElement.blur();//去除软键盘
+        cityPicker3.setData(cityData3);
+        cityPicker3.show(function(items) {
+            var showCityPickerInput=document.getElementById('usercity'+item.id);
+            item3=(items[2] || {}).text?(items[2] || {}).text:'';
+            showCityPickerInput.value = (items[0] || {}).text + " " + (items[1] || {}).text + " " + item3;
+            //返回 false 可以阻止选择框的关闭
+//            将pro cit are赋值给每个item
+            item.pro=(items[0] || {}).value;
+            item.cit=(items[1] || {}).value;
+            item.are=(items[2] || {}).value?(items[2] || {}).value:'';
+        });
+        this.blur();
+    }
+
+
+    function changeAddr(item){
+        if(!(/^1[34578]\d{9}$/.test(item.mob))){
+            alert( '请输出正确的电话号码');
+            var mobile=document.getElementById(item.mobileId);
+            mobile.value=item.mobile;
+            mobile.focus();
+            return false;
+
+        }else{
+            if(!(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(item.card))){
+                alert( '请输出正确的身份证号');
+                var card = $("#item.card");
+                card.value=item.card;
+                card.focus();
+                return false;
+            }else{
+                if((item.aaaa&&item.bbbb)||(item.aaa&&item.bbb)){
+                    mui.ajax('/apic/address_add',{
+                        data:{
+                            id:item.id,
+                            accept_name:item.name,
+                            province:item.pro?item.pro:item.province,
+                            city:item.cit?item.cit:item.city,
+                            area:item.are?item.are:item.area,
+                            address:item.addr,
+                            mobile:item.mob,
+                            zip:item.zi,
+                            card:item.card,
+                            aaa:item.aaa,
+                            bbb:item.bbb
+                        },
+                        dataType:'json',	// 服务器返回json格式数据
+                        type:'post',		// HTTP请求类型
+                        timeout:10000,		// 超时时间设置为10秒；
+                        success:function(data){
+                            console.log(data);
+
+                            if(statusOrder=="cart_order"){
+                                document.location.href="/simple/addresslist?rev=cart_order"
+                            }
+                            else{
+                                document.location.href="/simple/addresslist";
+                            }
+                        }
+                    });
+                }else {
+                    alert("请上传身份证！");
+
+                }
+
+            }
+        }
+    }
+    function changeDefault1(item){
+        var data1=item.id;
+        mui.ajax('/apic/address_default',{
+            data:{
+                id:data1,
+                is_default:1
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'get',//HTTP请求类型
+            timeout:10000,//超时时间设置为10秒；
+            success:function(data){
+                if(statusOrder=="cart_order"||statusOrder=="cart_order1"){
+                    window.location.href=getItem("cart2url");
+                }else{
+                    window.location.reload();
+                }
+            }
+        });
+    }
+    function addressDel(item,self){
+        var btnArray = ['取消', '确认'];
+        mui.confirm('您确定要删除收货地址吗？', '删除地址', btnArray, function(e) {
+            if (e.index == 1) {
+                mui.ajax('/apic/address_del',{
+                    data:{
+                        id:item.id
+                    },
+                    dataType:'json',//服务器返回json格式数据
+                    type:'get',//HTTP请求类型
+                    timeout:10000,
+                    success:function(data){
+                        var index=self.newList.indexOf(item);
+                        self.newList.splice(index,1);
+                    }
+                });
+            } else {
+
+            }
+        })
+    }
+    //	获取url传递过来的参数
+    function GetRequest() {
+        var url = location.search; //获取url中"?"符后的字串
+        var theRequest = new Object();
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for (var i = 0; i < strs.length; i++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+    function setItem(key,value){
+        var val=JSON.stringify(value)?JSON.stringify(value):[];
+        window.localStorage.setItem(key,val);
+    }
+    function getItem(key){
+        var getter= window.localStorage.getItem(key);
+        return JSON.parse(getter);
+    }
+    function pushHistory(statusOrder) {
+        var state = {
+            title: "title",
+            url: "#"
+        };
+        window.history.pushState(state, 'title', "#");
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<title>查看物流</title>
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>"/>
+	<link rel="stylesheet" type="text/css" href="/views/mobile/skin/default/css/delivery.css?v=<?php echo time(); ?>"/>
+</head>
+<body>
+<div id="wrap_top" v-cloak>
+	<div id="top">
+		<img src="/views/mobile/skin/default/image/bd.png" style="width: 7.5rem;height: 1.94rem;"/>
+	</div>
+	<div id="sub_wuliu">
+		<div id="sub_top">
+			<div class="top_left">
+				运输中
+				<p><img src="/views/mobile/skin/default/image/6F65F4C3-37CD-417C-9B83-60BE30B0AB6D@1x.png" style="width: 0.76rem;height:0.76rem"/></p>
+			</div>
+			<div class="top_right">
+				未签收
+				<p><img src="/views/mobile/skin/default/image/18F173E7-1FCD-44C5-916F-752613041A00@1x.png" style="width: 0.44rem;height: 0.44rem;"/></p>
+			</div>
+		</div>
+		<div id="sub_bottom">
+			<ul>
+				<li>物流状态：<span>运输中</span></li>
+				<li>承运来源：<span>{{info.name}}</span></li>
+				<li>订单编号：<span>{{info.order_no}}</span></li>
+				<!--<li>联系电话：<span>0571-11113333</span></li>-->
+			</ul>
+		</div>
+	</div>
+	
+	<div id="foorter">
+		
+	</div>
+	
+	<div id="btm_foorter">
+		<ul>
+			<li v-for="item in info1">
+				<p>{{item.StatusDetail}}</p>
+				<span>{{item.StartTime}}</span>
+			</li>
+
+		</ul>
+		<div class="wuliu_bom">
+			<p  v-for="item,key in info.data" :class="key==0? 'active':'2'"></p>
+		</div>
+	</div>
+</div>
+	<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+	<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+    <script>
+        var order_no = "<?php echo $_GET['order_no']; ?>"
+        var em = new Vue({
+            el:"#wrap_top",
+            data:{
+                info:[],
+                info1:[]
+            },
+            computed:{
+            },
+            mounted:function () {
+                var self = this;
+                delivery(self);
+            },
+            updated:function () {
+            }
+        })
+        function delivery(self) {
+            $.ajax({
+                dataType:"json",
+                url:'/apic/get_logistic_info',
+                data:{order_no:order_no},
+                success:function (data) {
+//                    console.log(data.data);
+                    if(data.data.type == "xlobo"){
+                        self.info = data.data;
+                        console.log(self.info.name);
+                        self.info1 =  self.info.data.reverse()
+                    }
+
+                }
+            })
+        }
+    </script>
+</body>
+</html>

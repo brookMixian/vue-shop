@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="x5-orientation" content="portrait">
+    <title>爱逛街</title>
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/app/articleList.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<!--vue容器-->
+<div id="articleList">
+    <loadding :mes="showloadding"></loadding>
+    <head-nav :state="2"></head-nav>
+    <!--头部静态页面-->
+    <section class="head">
+        <div class="bannner">
+            <img src="/views/mobile/skin/default/image/article/banner1.png" alt="" style="width:100%" />
+        </div>
+        <div class="title flexbox">
+            <div class="top">
+                <img src="/views/mobile/skin/default/image/article/qout.png" alt="" style="width:0.5rem" />
+                专辑合集特别推荐
+            </div>
+            <div class="bg"></div>
+        </div>
+    </section>
+    <template >
+        <section class="recommended line albumn_index" v-for="(item,key) in new_data" :style="key==0?style.firstArticle:style.ortherArticle">
+            <article-list :item="item" :img1="img1" :img2="img2" @col="collect" :state="0"></article-list>
+        </section>
+    </template>
+    <div style="height:0.2rem;"></div>
+    <div class="fix-toTop hide" @click="fixToTop">
+        <img src="/views/mobile/skin/default/image/jmj/icon/top-icon.png" alt=""  />
+    </div>
+</div>
+<script src="/views/mobile/javascript/vue.js?v=<?php echo time(); ?>"></script>
+<!--加载动画载入-->
+<script src="/views/mobile/components/loadding.js?v=<?php echo time(); ?>"></script>
+<!--加载顶部导航-->
+<script src="/views/mobile/components/head_nav.js?v=<?php echo time(); ?>"></script>
+<!--article-list组件引入-->
+<script src="/views/mobile/components/article_list.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jquery.min.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/lazyload.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/mui.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jiumao/common.js?v=<?php echo time(); ?>"></script>
+<script src="/views/mobile/javascript/jiumao/articleList.js?v=<?php echo time(); ?>"></script>
+</body>
+</html>

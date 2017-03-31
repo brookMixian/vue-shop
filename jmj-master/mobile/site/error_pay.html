@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css" />
+    <link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+
+    <title>支付失败了...</title>
+    <style>
+        .content{
+            width:100%;
+            height:100%;
+            background:#fff;
+            display: -webkit-flex;
+            -webkit-justify-content: center;
+            flex-wrap: wrap;
+        }
+        .content img{
+            width:5.56rem;
+            height:5.08rem;
+            margin-top:0.78rem;
+        }
+        .content a{
+            display: block;
+            width:5.5rem;
+            background:#ff44a0;
+            box-shadow:0 0.02rem 0.04rem 0 rgba(255,67,160,0.50);
+            border-radius:0.08rem;
+            height:0.98rem;
+            font-size:0.36rem;
+            color:#ffffff;
+            letter-spacing:0.0067rem;
+            text-align:center;
+            line-height: 0.98rem;
+            margin-top:1rem;
+        }
+    </style>
+</head>
+<body>
+    <script src="/views/mobile/javascript/jquery.min.js?v=1.0.2"></script>
+    <script src="/views/sysdefault/javascript/function.js"></script>
+    <script src="/views/mobile/javascript/mui.js"></script>
+    <div class="content">
+            <img src="/views/mobile/skin/default/image/xinzeng/zfsb.png" alt="">
+        <!--<img src="/views/mobile/skin/default/image/xinzeng/error.png" alt="">-->
+        <a href="{url:/site/index}">去逛逛</a>
+    </div>
+    <?php
+        $order_no           = IReq::get("order_no");
+        if(!empty($order_no)){
+            $query          = new IQuery('order');
+            $query->where   = 'order_no='.$order_no;
+            $query->fields  = 'id';
+            $info           = $query->find();
+        }
+        $order_id           = empty($info) ? 0 : $info[0]['id'] ;
+    ?>
+    <script type="text/javascript">
+    window.onload=function(){
+        var btnArray = ['取消', '确认'];
+        mui.confirm('支付失败了，继续去付款？', '支付失败', btnArray, function (e) {
+            if (e.index == 1) {
+                window.location.href='<?php echo empty($order_id) ? "/site/index" : "/block/doPay/order_id/".$order_id; ?>';
+            } else {
+                window.location.href='{url:ucenter/order}';
+            }
+        })
+    }
+
+    </script>
+
+</body>
+</html>

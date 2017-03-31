@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="x5-orientation" content="portrait">
+	<title>购物车</title>
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/mui.css" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/icons-extra.css" />
+	<!--<link rel="stylesheet" href="/views/mobile/skin/default/css/app/jiumao.css" />-->
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/common.css" />
+	<link rel="stylesheet" href="/views/mobile/skin/default/css/app/cart.css?v=<?php echo time(); ?>" />
+</head>
+<body>
+<div id="cart_info">
+	<template v-if="showMessage && infoMessage.goodsList.length==0" v-cloak>
+		<section class="nodata">
+			<div class="emptyCart">
+				<img src="/views/mobile/skin/default/image/jmj/icon/cat_car.png" alt="" style="width:1.94rem;height:1.33rem;"/>
+			</div>
+			<div class="content">
+				<span>~</span>
+				<span>购物车还是空的哦</span>
+				<span>~</span>
+			</div>
+		</section>
+	</template>
+	<template v-else v-cloak>
+		<header v-if="showMessage">
+			<a href="http://mp.weixin.qq.com/s?__biz=MzI3MzQ3NTc1Ng==&mid=100000021&idx=1&sn=5fdb0e149001831242d616090c0ad549&chksm=6b23f0d65c5479c03816d4d8b04cec7635847914686a023dbc2a1d0e17f1012e7d4d9fee59bf&scene=0#wechat_redirect" class="classA"><img src="/views/mobile/skin/default/image/jmj/cart/cart-banner.png" alt="" style="width:100%"  /></a>
+		</header>
+		<div class="goodsInfo"  :style="newGoods.length==1?bottom_check:''">
+			<div class="top">
+				<img src="/views/mobile/skin/default/image/jmj/cart/plane.png" alt="" style="width:0.37rem;height:0.37rem;"/>
+				<span>东京直邮</span>
+			</div>
+			<div class="ware" v-for="item in newGoods">
+				<div class="box head-name">
+					<a :href="item.url" class="classA">
+						<div class="name">
+							{{item.name}}
+						</div>
+					</a>
+					<div class="del flexbox" @click='removeCart(item)'>
+						<img src="/views/mobile/skin/default/image/jmj/icon/del_w.png" alt="" style="width:0.36rem;height:0.39rem;" />
+					</div>
+				</div>
+                <div class="box middle">
+					<div class="left">
+                        <a :href="item.url" class="classA">
+                            <img :src="item.img" alt=""  style="width:1.2rem;height:1.2rem" />
+                            <div>
+								<div class="size" if="item.spec_array">
+									<span v-if=" item.spec_array.length>1 " v-for="sizes,key in item.spec_array_two">{{sizes.value}}<t v-if="key==0">色</t><t v-if="key==1">码</t><span v-if="key==0"> , </span></span>
+									<span v-if=" item.spec_array.length==1 " v-for="sizes,key in item.spec_array_two">{{sizes.value}}<t>色</t></span></span>
+								</div>
+								<div class="sellprice">
+									￥ {{item.sell_price}}
+								</div>
+							</div>
+                        </a>
+					</div>
+					<div class="right">
+						<img :src="item.count==1?imgReduce:imgReduceA" alt="" style="width:0.5rem;height:0.5rem;" class="reduce" @click="reduceCount(item)" />
+						<input type="number"  v-model="item.newCount"  @change="cartCountF(item)"/>
+						<img :src="imgAdd" alt="" style="width:0.5rem;height:0.5rem;" class="add" @click="addCount(item)"/>
+					</div>
+				</div>
+				<div class="bottom box">
+
+				</div>
+			</div>
+		</div>
+		<div class="cal" v-if="showMessage">
+			<div class="calPrice box">
+				<div class="text1">
+					<span class="txt">合计: </span>
+					<span class="pri">￥ {{infoMessage.final_sum}}</span>
+				</div>
+				<div>
+					<span class="delAll" @click="delAll">全部删除</span>
+					<a  href="{url:/simple/cart2}"  class="toPay classA">结算({{infoMessage.count}})</a>
+				</div>
+
+			</div>
+			<a href="#" class="condition_price" @click="freeShipp">
+				{{freeShipping}}
+			</a>
+		</div>
+	</template>
+	<footer-nav :state="3" :states="cart_st"></footer-nav>
+</div>
+<div style="height:90px;"></div>
+<script src="/views/mobile/javascript/vue.js"></script>
+<script src="/views/mobile/javascript/jquery.min.js"></script>
+<script src="/views/mobile/javascript/mui.js"></script>
+<!--//底部导航样式的引入-->
+<script src="/views/mobile/components/footer_nav.js?v=<?php echo time(); ?>"></script>
+<script>
+	var vm = new Vue({
+		el: '#cart_info',
+		data: {
+			showMessage:false,
+			cart_st:false,
+			infoMessage:{
+				goodsList:[]
+			},
+			imgReduce:'/views/mobile/skin/default/image/jmj/cart/reduce.png',
+			imgReduceA:'/views/mobile/skin/default/image/jmj/cart/ruduceable.png',
+			imgAdd:'/views/mobile/skin/default/image/jmj/cart/add.png',
+			free_ok:'',
+            state:true,
+			bottom_check:'margin-bottom:0.2rem'
+		},
+		computed: {
+			// 读取和设置
+			newGoods: function() {
+				this.infoMessage.goodsList.map(function(item){
+					item.totalPrice=(item.sell_price*item.count).toFixed(2);
+                    item.url="/site/products?id="+item.goods_id;
+					item.newCount=item.count;
+					if(item.spec_array){
+						item.spec_array_two = JSON.parse(item.spec_array).reverse();
+					}
+				});
+				return  this.infoMessage.goodsList;
+			},
+			freeShipping:function(){
+//				if(this.infoMessage.sum>this.infoMessage.condition_price){
+//                    this.free_ok=false;
+//					return "我们帮你免邮费了,去逛逛";
+//				}else{
+					return "去凑单";
+//				}
+			},
+			totalPrice:function(){
+
+			},
+			totalCount:function(){
+
+			}
+		},
+		mounted: function(){
+			clear_pull();
+		},
+		updated:function() {
+			this.cart_st = true;
+		},
+		methods: {
+			getData: function () {
+				var self = this;
+				getCartInfo(self);
+			},
+			cartCountF:function(item){
+				var newCount=item.newCount;
+				var self=this;
+				var diff;
+				if(newCount>item.store_nums){
+					item.newCount=item.store_nums;
+					alert("商品库存不足")
+				}
+				if(newCount<1){
+					item.newCount=1;
+					alert("商品数量必须大于1件")
+				}
+				diff=item.newCount-item.count;
+				if(this.state){
+					self.state=false;
+					cartCount(item,diff,self);
+				}
+			},
+			reduceCount:function(item){
+                var self=this;
+				if(item.count-1<=0){
+                    item.count=1;
+				}
+				if(item.count>1&&this.state){
+                    self.state=false;
+					cartCount(item,-1,self);
+				}
+			},
+			addCount:function(item){
+			    var self=this;
+				if(item.count>=item.store_nums){
+					item.count=item.store_nums;
+//					alert("商品的库存量不足");
+				}
+				if(item.count<item.store_nums&&self.state){
+                    this.state=false;
+					cartCount(item,1,self);
+				}
+			},
+			removeCart: function(item){
+				clear_pull()
+				var self=this;
+				removeCartByJSON(self,item)
+			},
+			freeShipp:function(){
+				window.location.href = "/site/index"
+			},
+			delAll:function(){
+				var self=this;
+				var btnArray = ['取消', '移除'];
+				mui.confirm('您确定要清空购物车吗？', '清空购物车', btnArray, function (e) {
+					if (e.index == 1) {
+						$.getJSON("{url:/apic/cart_clear}", function (res) {
+							console.log(res);
+							self.infoMessage.goodsList=[];
+						});
+					}
+				})
+			}
+		}
+	})
+	vm.getData();
+	$(window).load(function(){
+		mui("body").on('tap',"#sum_count",function(){
+			window.location.href='index.php?controller=simple&action=cart2';
+		})
+		mui('body').on('tap','.classA',function(){document.location.href=this.href;});
+		mui('body').on('tap','.locationA',function(){document.location.href=this.href;});
+		//定义template方法
+	});
+function getCartInfo(self){
+	mui.ajax('/apic/cart',{
+		dataType:'json',//服务器返回json格式数据
+		type:'post',//HTTP请求类型
+		timeout:10000,//超时时间设置为10秒；
+		success:function(data){
+			self.infoMessage=data.data;
+			self.showMessage=true;
+			setItem("condition_price",data.data.condition_price);
+		}
+	});
+}
+//购物车数量改动计算
+function cartCount(item,diff,self) {
+    var goods_id = item.product_id > 0 ? item.product_id : item.goods_id;
+    var goods_type = item.product_id > 0 ? "product" : "goods";
+    //更新购物车中此商品的数量
+    $.getJSON("{url:/simple/joinCart}", {
+        "goods_id": goods_id,
+        "type": goods_type,
+        "goods_num": diff,
+        "random": Math.random()
+    }, function (content) {
+        item.count=parseInt(item.count)+diff;
+        self.infoMessage.final_sum=(parseFloat(self.infoMessage.final_sum)+parseFloat(item.sell_price)*diff).toFixed(2);
+        self.infoMessage.count=parseInt(self.infoMessage.count)+diff;
+        self.state=true;
+        if (content.isError == true) {
+            alert(content.message);
+
+        } else {
+
+        }
+    })
+}
+//移除购物车
+function removeCartByJSON(self,item) {
+	var goods_id = item.product_id > 0 ? item.product_id : item.goods_id;
+	var goods_type = item.product_id > 0 ? "product" : "goods";
+	var btnArray = ['取消', '移除'];
+	mui.confirm('您确定要移除本商品吗？', '移除购物车', btnArray, function (e) {
+		if (e.index == 1) {
+			$.getJSON("{url:/simple/removeCart}", {
+				"goods_id": goods_id,
+				"type": goods_type,
+				"random": Math.random()
+			}, function () {
+                self.infoMessage.final_sum=(self.infoMessage.final_sum-item.totalPrice).toFixed(2);
+                self.infoMessage.count-=item.count;
+				var index=self.newGoods.indexOf(item);
+				self.newGoods.splice(index,1);
+			});
+		} else {
+
+		}
+
+	})
+}
+	//本地缓存函数
+	function setItem(key,value){
+		var val=JSON.stringify(value)?JSON.stringify(value):[];
+		window.localStorage.setItem(key,val);
+	}
+	function getItem(key){
+		var getter= window.localStorage.getItem(key);
+		return JSON.parse(getter);
+	}
+	$(window).load(function(){
+		mui('body').on('tap','.locationA',function(){document.location.href=this.href;});
+
+	})
+	mui('body').on('tap','.locationA',function(){document.location.href=this.href;});
+function clear_pull(){
+	removeSessionItem("state");
+	removeSessionItem("state2");
+	removeSessionItem("keys");
+	removeSessionItem("self_info");
+	removeSessionItem("key2");
+	removeSessionItem("s_pull");
+}
+	function removeSessionItem(key){
+        window.sessionStorage.removeItem(key);
+    }
+</script>
